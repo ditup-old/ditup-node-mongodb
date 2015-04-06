@@ -7,7 +7,7 @@ up - start it up
 
 ## development
 
-If you're looking for older (unfinished) version written in PHP, look into https://github.org/ditup/ditup-php.
+If you're looking for older (unfinished) version written in PHP, look into https://github.com/ditup/ditup-php.
 
 ### technology
 * server: nodejs
