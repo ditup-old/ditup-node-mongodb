@@ -9,6 +9,11 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "express": "^4.12.3"
+    "body-parser": "^1.12.4",
+    "ejs": "^2.3.1",
+    "express": "^4.12.4",
+    "favicon": "0.0.2",
+    "logger": "0.0.1",
+    "mongoose": "^4.0.3"
   }
 }

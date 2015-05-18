@@ -1,0 +1,5 @@
+[
+    {"url":"/", "controller":"home", "type": "get"},
+    {"url":"/login", "controller":"login", "type": "use"},
+    {"url":"/signup", "controller":"signup", "type": "use"}
+]
