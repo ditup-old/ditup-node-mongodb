@@ -1,11 +1,12 @@
 'use strict';
 
 var express = require('express'),
-    app = express(),
+    session = require('express-session'),
     path = require('path'),
     fs = require('fs'),
     bodyParser = require('body-parser'),
-    http = require('http');
+    http = require('http'),
+    app = express();
 
 
 // database connection
@@ -26,10 +27,9 @@ app.set('views', __dirname + '/app/views');
 app.set('view engine', 'ejs');
 //app.use(express.favicon());
 //app.use(express.logger('dev'));
+app.use(session({secret:'ssshhhhh', resave: true, saveUninitialized: true}));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended:true
-}));
+app.use(bodyParser.urlencoded({extended:true}));
 //app.use(express.methodOverride());
 //app.use(express.cookieParser('your secret here'));
 //app.use(express.session());
