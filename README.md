@@ -11,4 +11,4 @@ If you're looking for older (unfinished) version written in PHP, look into https
 
 ### technology
 * server: nodejs
-* database undecided: mongodb? neo4j? mysql? other?
+* database: mongodb
