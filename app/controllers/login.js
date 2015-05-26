@@ -60,6 +60,7 @@ function authenticate (username, password) {
         }
     },1000);
     return deferred.promise;
-};
+}
+
 
 module.exports=router;

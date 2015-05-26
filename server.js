@@ -11,7 +11,7 @@ var express = require('express'),
 
 // database connection
 var mongoose = require('mongoose');
-var db = mongoose.connect('mongodb://localhost/mydb', function (err) {
+var db = mongoose.connect('mongodb://localhost/ditup', function (err) {
     if(err) {
         console.log('connection error', err);
     }

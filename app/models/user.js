@@ -11,7 +11,7 @@ var UserSchema = new mongoose.Schema({
         birthday: Date,     //birthday (used to show age only)
         birthday_v: Boolean,//birthday visibility
         gender: String,     //male, female, other
-        gender_v: String,   //gender visibility
+        gender_v: Boolean,   //gender visibility
         about: String       //user's personal description
     },
     account:{
@@ -28,6 +28,6 @@ var UserSchema = new mongoose.Schema({
         salt: String,
         iterations: Number
     }
-});
+}, {collection: 'user'});
 
 module.exports = mongoose.model('User', UserSchema);

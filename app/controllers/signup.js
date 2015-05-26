@@ -4,6 +4,12 @@ var express = require('express');
 var router = express.Router();
 var Q = require('q');
 var User = require('../models/user');
+var iterations = require('../../config/password').iterations;
+var hashFunctions = require('./user/user');
+var hashPassword = hashFunctions.hashPassword;
+var generateSalt = hashFunctions.generateSalt;
+var generateHexCode = hashFunctions.generateHexCode;
+var sendVerifyEmail = hashFunctions.sendVerifyEmail;
 
 //var mongoose = require('mongoose');
 //var User = require('../models/user');
@@ -33,22 +39,60 @@ router.post('/', function(req, res, next){
                             
     validate(formData)
     .then(function (validateData) {
+        //if data are valid
         if(validateData.valid === true){
-            var newUser = new User({
-                username: formData.username,
-                email: formData.email,
-                profile: {
-                    name: formData.name,
-                    surname: formData.surname
-                },
-                login: {
-                    password: formData.password //(TODO hash to be secure!!!)
-                }
-            });
+            var salt, verifyCode; //to store salt when we generate it
+            generateSalt()  //generate salt
+            .then(function(_salt){  //generate hashed password and verification code asynchronously
+                salt = _salt
+                return Q.all([hashPassword(formData.password, salt, iterations), generateHexCode(16)]);
+            })
+            .then(function(outcome){
+                var hashedPassword = outcome[0];
+                verifyCode = outcome[1];
 
-            newUser.save(function(err, nu) {
-                if (err) return console.error(err);
-                res.end(JSON.stringify(nu));
+                var newUser = new User({
+                    username: formData.username,
+                    email: formData.email,
+                    profile: {
+                        name: formData.name,
+                        surname: formData.surname,
+                        birthday: null,
+                        birthday_v: false,
+                        gender: '',
+                        gender_v: false,
+                        about: ''
+                    },
+                    account:{
+                        join_date: new Date(),
+                        email_verified: false,
+                        email_verified_date: null,
+                        email_verify_code: verifyCode,
+                        active_account: true,
+                        last_login: null,
+                        last_message_visit: null
+                    },
+                    login: {
+                        salt: salt,
+                        password: hashedPassword,
+                        iterations: iterations
+                    }
+                });
+                console.log('ready to save');                
+                return (function(newUser){
+                    var deferred = Q.defer();
+                    newUser.save(function (err, nu) {
+                        if(err) deferred.reject(err);
+                        deferred.resolve(nu);
+                    });
+                    return deferred.promise;
+                })(newUser);
+            })
+            .then(function (savedUser) {
+                return sendVerifyEmail(formData.username, formData.email, verifyCode);
+            })
+            .then(function (success) { 
+                res.end('Welcome ' + formData.username + '. Your new account was created and verification email was sent to ' + formData.email + '. It should arrive soon. In the meantime why don\'t you fill up your profile?');
             });
         }
         else{
@@ -116,29 +160,27 @@ function validate(formData) {
         errors.password2.push('passwords don\'t match');
     }
 
-    //asynchronously check if username is unique
-    User.find({ username: formData.username })
-    .exec()
-    .then(function(userArray){
-        console.log(userArray);
-        if(userArray.length > 0){
+    //asynchronously check if username and email is unique
+
+    Q.all([
+        User.find({ username: formData.username }).exec(),
+        User.find({ email: formData.email }).exec()
+    ])
+    .then(function(search){
+        var users = search[0],
+            emails = search [1];
+        if(users.length > 0){
             valid = false;
             errors.username = errors.username || [];
             errors.username.push('username must be unique');
         }
-    })
-    .then(function(){
-        //asynchronously check if email is unique
-        User.find({ email: formData.email })
-        .exec()
-        .then(function (userArray) {
-            if(userArray.length > 0) {
-                valid = false;
-                errors.email = errors.email || [];
-                errors.email.push('email must be unique');
-            }
-            deferred.resolve({valid: valid, errors: errors});
-        });
+        if(emails.length > 0){
+            valid = false;
+            errors.email = errors.email || [];
+            errors.email.push('email must be unique');
+        }
+        
+        deferred.resolve({valid: valid, errors: errors});
     });
 
     return deferred.promise;
