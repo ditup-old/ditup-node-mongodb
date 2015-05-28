@@ -6,12 +6,19 @@
 <div><!-- basic profile info -->
     <div>upload profile picture</div>
     <div>
-        <div>birthday <input type="text" name="birthday" value="<%= profile.birthday %>"/></div>
-        <div>gender <input type="text" name="gender" value="<%= profile.gender %>"/></div>
+        <div>birthday <input type="text" name="birthday" value="<%= profile.birthday %>" placeholder="yyyy-mm-dd"/></div>
+        <div>gender
+            <select name="gender">
+                <option value="unspecified">unspecified</option>
+                <option value="male">male</option>
+                <option value="female">female</option>
+                <option value="other">other</option>
+            </select>
+        </div>
     </div>
 </div>
 <div><!--  -->
-    <div><span><input type="text" name="name" value="<%= profile.name %>" /></span> <span><input type="text" name="surname" value="<%= profile.surname %>" /></span><span>@<%= profile.username %></span> <span><a href="/user/<%= profile.username %>">Cancel</a> <input type="submit" name="submit" value="Save Changes" /></span></div>
+    <div><span><input type="text" name="name" value="<%= profile.name %>" placeholder="Name" /></span> <span><input type="text" name="surname" value="<%= profile.surname %>" placeholder="Surname" /></span><span>@<%= profile.username %></span> <span><a href="/user/<%= profile.username %>">Cancel</a> <input type="submit" name="submit" value="Save Changes" /></span></div>
     <div><!-- tags -->
         tags
     </div>
