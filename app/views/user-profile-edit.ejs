@@ -1,0 +1,22 @@
+<html>
+<head>
+</head>
+<body>
+<form method="post" >
+<div><!-- basic profile info -->
+    <div>upload profile picture</div>
+    <div>
+        <div>birthday <input type="text" name="birthday" value="<%= profile.birthday %>"/></div>
+        <div>gender <input type="text" name="gender" value="<%= profile.gender %>"/></div>
+    </div>
+</div>
+<div><!--  -->
+    <div><span><input type="text" name="name" value="<%= profile.name %>" /></span> <span><input type="text" name="surname" value="<%= profile.surname %>" /></span><span>@<%= profile.username %></span> <span><a href="/user/<%= profile.username %>">Cancel</a> <input type="submit" name="submit" value="Save Changes" /></span></div>
+    <div><!-- tags -->
+        tags
+    </div>
+    <div><h1>about me</h1><div><textarea name="about"><%= profile.about %></textarea></div></div>
+</div>
+</form>
+</body>
+</html>

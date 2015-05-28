@@ -1,0 +1,21 @@
+<html>
+<head>
+</head>
+<body>
+<div><!-- basic profile info -->
+    <div>profile picture</div>
+    <div>
+        <div><%= profile.age %></div>
+        <div><%= profile.gender %></div>
+        <div>Member since <%= profile.joined %></div>
+    </div>
+</div>
+<div><!--  -->
+    <div><span><%= profile.name %></span> <span>@<%= profile.username %></span> <span><a href="/user/<%= profile.username %>/edit">Edit Profile</a></span></div>
+    <div><!-- tags -->
+        tags
+    </div>
+    <div><h1>about me</h1><div><%= profile.about %></div></div>
+</div>
+</body>
+</html>

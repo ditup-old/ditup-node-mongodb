@@ -17,10 +17,10 @@ var sendVerifyEmail = hashFunctions.sendVerifyEmail;
 router.get('/', function(req, res, next){
     var sess = req.session;
     if(sess.logged === true){
-        res.render('sysinfo', {msg: 'you are logged in as ' + sess.username + '. To sign up you need to log out first.'});
+        return res.render('sysinfo', {msg: 'you are logged in as <a href="/user/'+ sess.username +'" >' + sess.username + '</a>. To sign up you need to <a href="/logout">log out</a> first.'});
     }
     else {
-        res.render('signup');
+        return res.render('signup', {errors: {}, values: {}});
     }
 });
 
@@ -92,11 +92,11 @@ router.post('/', function(req, res, next){
                 return sendVerifyEmail(formData.username, formData.email, verifyCode);
             })
             .then(function (success) { 
-                res.end('Welcome ' + formData.username + '. Your new account was created and verification email was sent to ' + formData.email + '. It should arrive soon. In the meantime why don\'t you fill up your profile?');
+                return res.end('Welcome ' + formData.username + '. Your new account was created and verification email was sent to ' + formData.email + '. It should arrive soon. In the meantime why don\'t you fill up your profile?');
             });
         }
         else{
-            res.end(JSON.stringify(validateData.errors));
+            return res.render('signup', {errors: validateData.errors, values: formData});
         }
     });  
 });
