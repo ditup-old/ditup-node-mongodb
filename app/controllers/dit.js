@@ -34,7 +34,7 @@ router
           throw new Error('abort promise chain');
         }
         if (dit.form !== originalForm) {
-          res.redirect('/'+dit.form+'/url');
+          res.redirect('/'+dit.form+'/'+url);
           throw new Error('abort promise chain');
         }
         return fcs.processDitData(dit);
