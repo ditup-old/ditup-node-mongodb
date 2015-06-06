@@ -1,9 +1,19 @@
 <html>
 <head>
+
+<style>
+  div.avatar-pic {
+    background-image: url('/user/<%= profile.username %>/avatar');
+    background-repeat: no-repeat;
+    background-size: contain;
+    height:64px;
+    width:64px;
+  }
+</style>
 </head>
 <body>
 <div><!-- basic profile info -->
-  <div>profile picture</div>
+  <div class="avatar-pic" ></div>
   <div>
     <div><%= profile.age %></div>
     <div><%= profile.gender %></div>

@@ -2,6 +2,7 @@
 
 var Q = require('q');
 var UserModel = require('../../models/user');
+var fs = require('fs');
 
 var months = [
   'January',
@@ -194,13 +195,36 @@ var updateUserProfile = function (username, profileData) {
   return deferred.promise;
 };
 
+var getAvatar = function (username) {
+  var deferred = Q.defer();
+  fs.readFile(__dirname+'/../../../files/img/empty-avatar.png', function (err, data) {
+    if(err) return deferred.reject(JSON.stringify(err));
+    return deferred.resolve({type: 'image/png', data: data});
+  });
+  return deferred.promise;
+}
+
+var getErrorImage = function () {
+  var deferred = Q.defer();
+  fs.readFile(__dirname+'/../../../files/img/404.png', function (err, data) {
+    console.log('finished');
+    if(err) return deferred.reject(JSON.stringify(err));
+    console.log('success');
+    return deferred.resolve({type: 'image/png', data: data});
+  });
+  console.log('getting error image');
+  return deferred.promise;
+}
+
 module.exports = {
   getUser: getUser,
   myRightsToUser: myRightsToUser,
   processUserData: processUserData,
   processUserDataEdit: processUserDataEdit,
   validateProfile: validateProfile,
-  updateUserProfile: updateUserProfile
+  updateUserProfile: updateUserProfile,
+  getAvatar: getAvatar,
+  getErrorImage: getErrorImage
 };
 
 

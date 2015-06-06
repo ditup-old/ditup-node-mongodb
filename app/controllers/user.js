@@ -37,6 +37,39 @@ router
         res.render('sysinfo', {msg: err});
       });
   })
+  .get('/:username/avatar', function (req, res, next) {
+    var sess = req.session;
+    var username = req.params.username;
+
+    var user, rights;
+    fcs.getUser({username: username})
+      .then(function (_user){
+        user = _user;
+        var me = {logged: sess.logged, username: sess.username};
+        return fcs.myRightsToUser(me, user); //should return true/false & if true, type of rights
+      })
+      .then(function (_rights) {
+        rights = _rights;
+        if(rights.view !== true){
+          return Q.reject('cannot view');
+        }
+        return fcs.getAvatar(username);
+      })
+      .then(function (image) {
+        res.writeHead(200, {'Content-Type': image.type});
+        return res.end(image.data); // Send the file data to the browser.
+      })
+      .catch(function (err) {
+        console.log(err);
+        return fcs.getErrorImage();
+      })
+      .then(function(image) {
+        res.writeHead(404, {'Content-Type': image.type});
+        return res.end(image.data); // Send the file data to the browser.
+      }, function(err){
+        return res.end(err);
+      });
+  })
   .get('/:username/edit', function (req, res, next) {
     var sess = req.session;
     var username = req.params.username;
