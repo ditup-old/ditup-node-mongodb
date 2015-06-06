@@ -2,6 +2,8 @@
 
 var crypto = require('crypto');
 var Q = require('q');
+var User = require('../../models/user');
+var iterations = require('../../../config/password').iterations;
 
 //hash password with 
 var hashPassword = function (password, salt, iterations) {
@@ -39,18 +41,10 @@ var generateHexCode = function (byteNumber) {
     return deferred.promise;
 }
 
-var sendVerifyEmail = function () {
-    var deferred = Q.defer();
-    process.nextTick(function(){
-        deferred.resolve(true);
-    });
-    return deferred.promise;
-};
 
 module.exports = {
     hashPassword: hashPassword,
     compareHashes: compareHashes,
     generateSalt: generateSalt,
-    generateHexCode: generateHexCode,
-    sendVerifyEmail: sendVerifyEmail
+    generateHexCode: generateHexCode
 };

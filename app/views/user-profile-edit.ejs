@@ -10,15 +10,27 @@
         <div>gender
             <select name="gender">
                 <option value="unspecified">unspecified</option>
-                <option value="male">male</option>
-                <option value="female">female</option>
-                <option value="other">other</option>
+                <option <% if (profile.gender === 'male') { %> selected="selected"<% } %> value="male">male</option>
+                <option <% if (profile.gender === 'female') { %> selected="selected"<% } %>value="female">female</option>
+                <option <% if (profile.gender === 'other') { %> selected="selected"<% } %>value="other">other</option>
             </select>
         </div>
     </div>
 </div>
 <div><!--  -->
-    <div><span><input type="text" name="name" value="<%= profile.name %>" placeholder="Name" /></span> <span><input type="text" name="surname" value="<%= profile.surname %>" placeholder="Surname" /></span><span>@<%= profile.username %></span> <span><a href="/user/<%= profile.username %>">Cancel</a> <input type="submit" name="submit" value="Save Changes" /></span></div>
+    <div>
+      <span>
+        <input type="text" name="name" value="<%= profile.name %>" placeholder="Name" />
+      </span>
+      <span>
+        <input type="text" name="surname" value="<%= profile.surname %>" placeholder="Surname" />
+      </span>
+      <span>@<%= profile.username %></span>
+      <span>
+        <a href="/user/<%= profile.username %>">Cancel</a>
+        <input type="submit" name="submit" value="Save Changes" />
+      </span>
+    </div>
     <div><!-- tags -->
         tags
     </div>
