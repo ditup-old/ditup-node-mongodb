@@ -31,7 +31,7 @@ router
         return fcs.processUserData(user);
       })
       .then(function (profile) {
-        return res.render('user-profile', {profile: profile, rights: rights});
+        return res.render('user-profile', {profile: profile, rights: rights, session: sess});
       })
       .catch(function (err) {
         res.render('sysinfo', {msg: err});

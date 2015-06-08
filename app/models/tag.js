@@ -1,13 +1,16 @@
 'use strict';
 
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-var TagSchema = new mongoose.Schema({
-  tagname: {type: String, unique: true},
+var TagSchema = new Schema({
+  name: {type: String, unique: true},
   description: {type: String},
   meta: {
     create_time: {type: Date},
-    creator: {type: mongoose.Schema.ObjectId, ref: 'user'}
+    creator: {type: Schema.ObjectId, ref: 'user'},
+    users: [{type: Schema.ObjectId, ref: 'user'}],
+    dits: [{type: Schema.ObjectId, ref: 'dit'}]
   }
 }, {collection: 'tag'});
 

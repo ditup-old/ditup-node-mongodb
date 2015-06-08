@@ -1,34 +1,35 @@
-<html>
-<head>
+<%
+var css = [
+  '/css/header.css',
+  '/css/user-profile.css'
+];
+var title = 'profile of @'+profile.username ;
 
+%><% include ./partial/page-top.ejs %>
+<% include ./partial/header.ejs %>
 <style>
   div.avatar-pic {
     background-image: url('/user/<%= profile.username %>/avatar');
     background-repeat: no-repeat;
     background-size: contain;
-    height:64px;
-    width:64px;
+    width:100%;
+    padding-bottom:100%;
   }
 </style>
-</head>
-<body>
-<div><!-- basic profile info -->
+<div class="panel-basic" ><!-- basic profile info -->
   <div class="avatar-pic" ></div>
-  <div>
-    <div><%= profile.age %></div>
-    <div><%= profile.gender %></div>
-    <div>Member since <%= profile.joined %></div>
-  </div>
+  <div><%= profile.age %></div>
+  <div><%= profile.gender %></div>
+  <div>Member since <%= profile.joined %></div>
 </div>
-<div><!--  -->
+<div class="panel-info" ><!--  -->
   <div>
-    <span><%= profile.name %></span>
-    <span>@<%= profile.username %></span>
-    <% if (rights.edit === true) { %><span><a href="/user/<%= profile.username %>/edit">Edit Profile</a></span><% } %></div>
+    <span class="profile-name" ><%= profile.name %></span>
+    <span class="profile-username" >@<%= profile.username %></span>
+    <% if (rights.edit === true) { %><span><a class="button" href="/user/<%= profile.username %>/edit">Edit Profile</a></span><% } %></div>
   <div><!-- tags -->
-    tags
+    <span class="tag" >alternative-education</span><span class="tag" >nomads</span>
   </div>
   <div><h1>about me</h1><div><%= profile.about %></div></div>
 </div>
-</body>
-</html>
+<% include ./partial/page-bottom.ejs %>

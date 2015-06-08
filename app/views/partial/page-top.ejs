@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title><%= title %></title>
+  <link rel="icon" type="image/png" href="/img/livegraph_icon.png" />
+  <link rel="stylesheet" type="text/css" href="/css/reset.css" />
+  <link rel="stylesheet" type="text/css" href="/css/main.css" />
+  <link rel="stylesheet" type="text/css" href="/libs/fonts/font-awesome-4.3.0/css/font-awesome.min.css" /><%
+var len = css.length;
+for (var i = 0; i < len; i++) {%>
+  <link rel="stylesheet" type="text/css" href="<%= css[i] %>" />
+<% } %>
+</head>
+<body style="background:#fff;">
