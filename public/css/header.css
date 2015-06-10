@@ -93,6 +93,9 @@ span.span-image{
 #header-ditup-logo{
   height:30px;
   width:30px;
+  position: relative;
+  top: -8px;
+  margin-right:8px;
   -webkit-background-size: 100%; /* For WebKit*/
   -moz-background-size: 100%;  /* Mozilla*/
   -o-background-size: 100%;    /* Opera*/
@@ -102,8 +105,17 @@ span.span-image{
 #header-user-avatar{
   height:30px;
   width:30px;
+  position: relative;
+  top: -7.5px;
+  margin-right: 5px;
+  border-radius:15px;
   -webkit-background-size: 100%; /* For WebKit*/
   -moz-background-size: 100%;  /* Mozilla*/
   -o-background-size: 100%;    /* Opera*/
   background-size: 100%;     /* Generic*/
+}
+
+#search-form-header {
+    top: 7.5px;
+    position: relative;
 }

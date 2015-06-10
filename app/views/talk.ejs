@@ -1,0 +1,24 @@
+<%
+var css = [
+  '/css/header.css',
+  '/css/talk.css'
+];
+var title = 'talk';
+
+%><% include ./partial/page-top.ejs %>
+<% include ./partial/header.ejs %>
+
+    <div id="content-wrap" >
+      <div id="chat-wrap" >
+        <div id="chat"></div>
+        <form id="send-message" >
+          <input size="35" id="message" />
+          <input type="submit" />
+        </form>
+      </div>
+      <div id="talk-list">
+        
+      </div>
+    </div>
+
+<% include ./partial/page-bottom.ejs %>
