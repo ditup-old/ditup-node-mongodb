@@ -42,6 +42,11 @@ app.use(express.static(path.join(__dirname + '/public')));
 });
 */
 
+app.use(function(req, res, next) {
+  console.log(JSON.stringify(req.session));
+  next();
+});
+
 var modules = require('./routes.json');
 
 for(var i=0, len=modules.length; i<len; i++){
