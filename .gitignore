@@ -1,5 +1,8 @@
 node_modules
 *.swp
-public/img
+public/img/*
 files/img/avatars/*
 public/libs
+
+#Allow
+!public/img/logo*
