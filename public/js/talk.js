@@ -2,7 +2,8 @@
 (function ($, io) {
 
   var $chat = $('#chat');
-  var socket = io.connect();
+  var socket = io(':3000/talk-io');
+  //var socket = io();
 
   socket.on('connect', function () {
     $chat.append('connected to the server<br />');

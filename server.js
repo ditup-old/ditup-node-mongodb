@@ -13,8 +13,8 @@ var express = require('express'),
 var server = http.createServer(app);
 var io = sio.listen(server);
 
-io.sockets
-  //.of('/talk')
+io
+  .of('/talk-io')
   .on('connection', function (socket) {
   
   socket.on('disconnect', function () {
