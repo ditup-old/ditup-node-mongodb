@@ -3,6 +3,22 @@ var css = [
   '/css/header.css',
   '/css/talk.css'
 ];
+
+var headScripts = [
+//  {
+//    src: '/libs/js/require.js',
+//    properties: {
+//      'data-main': '/js/talk'
+//    }
+//  },
+];
+
+var scripts = [
+  {src: '/libs/js/jquery.js'},
+  {src: '/socket.io/socket.io.js'},
+  {src: '/js/talk.js'}
+];
+
 var title = 'talk';
 
 %><% include ./partial/page-top.ejs %>

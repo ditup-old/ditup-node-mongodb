@@ -1,12 +1,26 @@
 'use strict';
 
 var express = require('express'),
-  session = require('express-session'),
-  path = require('path'),
-  fs = require('fs'),
-  bodyParser = require('body-parser'),
-  http = require('http'),
-  app = express();
+    session = require('express-session'),
+    path = require('path'),
+    fs = require('fs'),
+    bodyParser = require('body-parser'),
+    http = require('http'),
+    sio = require('socket.io'),
+    app = express();
+
+
+var server = http.createServer(app);
+var io = sio.listen(server);
+
+io.sockets
+  //.of('/talk')
+  .on('connection', function (socket) {
+  
+  socket.on('disconnect', function () {
+    console.log('client disconnected');
+  });
+});
 
 // database connection
 var mongoose = require('mongoose');
@@ -73,7 +87,7 @@ app.use(fof);
 //app.use('/signup', signupRouter);
 
 
-http.createServer(app).listen(app.get('port'), function() {
+server.listen(app.get('port'), function() {
   console.log('Express server listening on port', app.get('port'));
 });
 
