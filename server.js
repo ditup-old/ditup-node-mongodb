@@ -11,16 +11,8 @@ var express = require('express'),
 
 
 var server = http.createServer(app);
-var io = sio.listen(server);
 
-io
-  .of('/talk-io')
-  .on('connection', function (socket) {
-  
-  socket.on('disconnect', function () {
-    console.log('client disconnected');
-  });
-});
+var io = sio.listen(server);
 
 // database connection
 var mongoose = require('mongoose');
@@ -33,6 +25,8 @@ var db = mongoose.connect('mongodb://localhost/ditup', function (err) {
   }
 });
 
+var sessionMiddleware = session({secret:'ssshhhhh', resave: true, saveUninitialized: true});
+
 // some environment variables
 
 app.set('port', process.env.PORT || 3000);
@@ -40,7 +34,7 @@ app.set('views', __dirname + '/app/views');
 app.set('view engine', 'ejs');
 //app.use(express.favicon());
 //app.use(express.logger('dev'));
-app.use(session({secret:'ssshhhhh', resave: true, saveUninitialized: true}));
+app.use(sessionMiddleware);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 //app.use(express.methodOverride());
@@ -56,8 +50,9 @@ app.use(express.static(path.join(__dirname + '/public')));
 });
 */
 
+//setting session variables
 app.use(function(req, res, next) {
-  console.log(JSON.stringify(req.session));
+  req.session.data = req.session.data || {logged: false, username: null};
   next();
 });
 
@@ -85,6 +80,25 @@ app.use(fof);
 //var signupRouter = require('./app/controllers/signup');
 //console.log('fk');
 //app.use('/signup', signupRouter);
+
+io.use(function(socket, next) {
+  sessionMiddleware(socket.request, socket.request.res, next);
+});
+
+var ioTalk = io.of('/talk-io');
+
+ioTalk
+  .on('connection', function (socket) {
+    console.log(socket.request, socket.request.session, socket.request.session.data);
+    var sess = socket.request.session.data;
+    
+    ioTalk.emit('auth', {logged: sess.logged, username: sess.username})
+    console.log('srs:', socket.request.session);
+
+    socket.on('disconnect', function () {
+      console.log('client disconnected');
+    });
+  });
 
 
 server.listen(app.get('port'), function() {
