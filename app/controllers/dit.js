@@ -11,6 +11,7 @@ router
     return res.redirect(url+'s');
   })
   .get('/:url', function (req, res, next) {
+    var sess = req.session.data;
     var url = req.params.url;
     var originalUrl = req.originalUrl;
     var urlArray = req.originalUrl.replace(/^[\/]+|[\/]+$/,'').split('/');
@@ -24,7 +25,7 @@ router
     Q.when(fcs.getDit({url:url}))
       .then(function (_dit) {
         dit = _dit;
-        var me = {logged: req.session.logged, username: req.session.username};
+        var me = {logged: sess.logged, username: sess.username};
         return fcs.getMyRightsToDit(me, dit);
       })
       .then(function (_rights) {
@@ -72,7 +73,7 @@ router
     Q.when(fcs.getDit({url:url}))
       .then(function (_dit) {
         dit = _dit;
-        var me = {logged: req.session.logged, username: req.session.username};
+        var me = {logged: sess.logged, username: sess.username};
         return fcs.getMyRightsToDit(me, dit);
       })
       .then(function (_rights) {
@@ -118,7 +119,7 @@ router
     Q.when(fcs.getDit({url:url}))
       .then(function (_dit) {
         dit = _dit;
-        var me = {logged: req.session.logged, username: req.session.username};
+        var me = {logged: sess.logged, username: sess.username};
         return fcs.iCanEditDit(me, dit);
       })
       .then(function (_rights) {
@@ -130,7 +131,7 @@ router
         return fcs.updateDitProfile(url, validData);
       })
       .then(function () {
-        req.session; //TODO put message to show in the next page 
+        //req.session; //TODO put message to show in the next page 
         return res.redirect('/'+data.form+'/'+url);
       }, function (errors) {
         return res.render('dit-profile-edit', {data:formData, rights:rights, errors: errors});

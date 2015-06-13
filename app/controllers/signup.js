@@ -33,8 +33,8 @@ router
   })
   .all('*', function(req, res, next) {
     console.log('initiation');
-    var sess = req.session;
-    console.log(req.session);
+    var sess = req.session.data;
+    console.log(req.session.data);
     if(sess.logged === true) {
       return res.render('sysinfo', {msg: 'you are logged in as <a href="/user/'+ sess.username +'" >' + sess.username + '</a>. To sign up you need to <a href="/logout">log out</a> first.'});
     }

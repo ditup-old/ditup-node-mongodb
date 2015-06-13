@@ -14,7 +14,7 @@ router
   })
   .get('/:username', function (req, res, next) {
     var username = req.params.username;
-    var sess = req.session;
+    var sess = req.session.data;
   //  var urlArray = req.originalUrl.replace(/^[\/]+|[\/]+$/,'').split('/');
   //  if(urlArray[0] === 'users') return res.redirect('/user/' + username);
     var user, rights;
@@ -38,7 +38,7 @@ router
       });
   })
   .get('/:username/avatar', function (req, res, next) {
-    var sess = req.session;
+    var sess = req.session.data;
     var username = req.params.username;
 
     var user, rights;
@@ -71,7 +71,7 @@ router
       });
   })
   .get('/:username/edit', function (req, res, next) {
-    var sess = req.session;
+    var sess = req.session.data;
     var username = req.params.username;
 
 
@@ -98,7 +98,7 @@ router
   })
   .post('/:username/edit', function (req, res, next){
     var username = req.params.username;
-    var sess = req.session;
+    var sess = req.session.data;
 
     var user, rights;
     fcs.getUser({username: username})

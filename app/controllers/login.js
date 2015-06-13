@@ -12,7 +12,7 @@ var compareHashes = hashFunctions.compareHashes;
 
 
 router.get('/', function (req, res, next) {
-    var sess = req.session;
+    var sess = req.session.data;
 
     if(sess.logged === true){
         res.render('sysinfo', {msg: 'you are already logged in as ' + sess.username}); //TODO
@@ -23,7 +23,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-    var sess = req.session;
+    var sess = req.session.data;
     if(sess.logged === true){
         res.render('sysinfo', {msg: 'you are already logged in as ' + sess.username}); //TODO
     }
