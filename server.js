@@ -1,18 +1,16 @@
 'use strict';
 
-var express = require('express'),
-    session = require('express-session'),
-    path = require('path'),
-    fs = require('fs'),
-    bodyParser = require('body-parser'),
-    http = require('http'),
-    sio = require('socket.io'),
-    app = express();
+var express = require('express');
+var app = express();
 
+var session = require('express-session');
+var path = require('path');
+var fs = require('fs');
+var bodyParser = require('body-parser');
 
-var server = http.createServer(app);
+var server = require('http').createServer(app);
 
-var io = sio.listen(server);
+var io = require('socket.io').listen(server);
 
 // database connection
 var mongoose = require('mongoose');
@@ -25,7 +23,8 @@ var db = mongoose.connect('mongodb://localhost/ditup', function (err) {
   }
 });
 
-var sessionMiddleware = session({secret:'ssshhhhh', resave: true, saveUninitialized: true});
+//TODO secret into different git-ignored-settings file.
+var sessionMiddleware = session({secret: 'TODO asdfasdf', resave: true, saveUninitialized: true});
 
 // some environment variables
 
@@ -87,17 +86,12 @@ io.use(function(socket, next) {
 
 var ioTalk = io.of('/talk-io');
 
+var ioTalkMiddleware = require('./app/controllers/talk-io.js');
+
+var ioUsers = {};
 ioTalk
   .on('connection', function (socket) {
-    console.log(socket.request, socket.request.session, socket.request.session.data);
-    var sess = socket.request.session.data;
-    
-    ioTalk.emit('auth', {logged: sess.logged, username: sess.username})
-    console.log('srs:', socket.request.session);
-
-    socket.on('disconnect', function () {
-      console.log('client disconnected');
-    });
+    ioTalkMiddleware(socket, {users: ioUsers});
   });
 
 
