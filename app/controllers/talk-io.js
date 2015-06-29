@@ -23,7 +23,8 @@ module.exports = function  (socket, params) {
   func.getTalks(username, {})
     .then(func.processTalks)
     .then(function (talks) {
-      socket.emit('talks', talks);
+      console.log('emitting', talks);
+      socket.emit('list talks', {talks: talks});
     });
 
   
@@ -59,6 +60,16 @@ module.exports = function  (socket, params) {
     //data should be list of participants and messages (last several messages)
     socket.emit('show talk', data);
   }
+
+  socket.on('start talk', function (talk) {
+    func.getTalk(talk)
+      .then(function (tk) {
+        socket.emit('start talk', tk);
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
+  });
 
   socket.on('disconnect', function () {
     delete users[username];

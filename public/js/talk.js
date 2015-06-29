@@ -10,6 +10,7 @@
   var $newTalkForm = $('#new-talk-form');
   var $newTalkMsg = $('#new-talk-msg');
   var $newTalkButton = $('#new-talk-button');
+  var $talkList = $('#talk-list');
 
   //variables
   var newTalkUsers = [];
@@ -30,7 +31,11 @@
   
   //show available talks
   socket.on('list talks', function (data) {
-    
+    console.log(JSON.stringify(data));
+    var talks = data.talks;
+    for(var i=0, len=talks.length; i<len; i++) {
+      addTalk(talks[i]);
+    }
   });
 
   //open a talk
@@ -125,6 +130,17 @@
     }
     $(this).remove(); 
   });
+
+  function addTalk(talk){
+    var talkElement = $(document.createElement('div'))
+      .text('talk ' + String(talk.id))
+      .on('mouseup', function () {
+        console.log('start talk', talk.id);
+        socket.emit('start talk', {id: talk.id});
+      });
+    $talkList.append(talkElement);
+  }
+
 
 
 })(jQuery, io);
