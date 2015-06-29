@@ -1,17 +1,16 @@
-<html>
-<head>
-<style>
-    input {
-        display: block;
-    }
-</style>
-</head>
-<body>
-<form method="post">
+<%
+var css = [
+  '/css/login.css'
+];
+
+var title = 'login';
+var headScripts = [];
+var scripts = [];
+%><%include ./partial/page-top.ejs %>
+<form method="post" id="login-form" >
 <input type="text" name="username" placeholder="username" />
 <input type="password" name="password" placeholder="password" />
 <input type="submit" name="login" value="Login!" />
 </form>
 <a href="">Forgotten password?</a>
-</body>
-</html>
+<% include ./partial/page-bottom.ejs %>

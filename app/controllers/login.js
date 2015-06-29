@@ -15,17 +15,25 @@ router.get('/', function (req, res, next) {
     var sess = req.session.data;
 
     if(sess.logged === true){
-        res.render('sysinfo', {msg: 'you are already logged in as ' + sess.username}); //TODO
+        res.render('sysinfo', {
+          msg: 'you are already logged in as ' + sess.username,
+          session: sess
+        }); //TODO
     }
     else {
-        res.render('login');
+        res.render('login', {
+          session: sess
+        });
     }
 });
 
 router.post('/', function (req, res, next) {
     var sess = req.session.data;
     if(sess.logged === true){
-        res.render('sysinfo', {msg: 'you are already logged in as ' + sess.username}); //TODO
+        res.render('sysinfo', {
+          msg: 'you are already logged in as ' + sess.username,
+          session: sess
+        }); //TODO
     }
     else{
         //TODO first some simple validation of values
@@ -37,10 +45,16 @@ router.post('/', function (req, res, next) {
             if (data.logged === true) {
                 sess.logged = true;
                 sess.username = req.body.username;
-                res.render('sysinfo', {msg: 'login successful'}); //TODO
+                res.render('sysinfo', {
+                  msg: 'login successful',
+                  session: sess
+                }); //TODO
             }
             else {
-                res.render('sysinfo', {msg: 'login not successful'}); //TODO
+                res.render('sysinfo', {
+                  msg: 'login not successful',
+                  session: sess
+                }); //TODO
             }
         });
         

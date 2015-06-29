@@ -1,12 +1,13 @@
-<html>
-<head>
-<style>
-#message {
-    color:green;
-}
-</style>
-</head>
-<body>
+<%
+  var css = [
+    '/css/header.css',
+    '/css/sysinfo.css'
+  ];
+
+  var title = 'system info';
+  var headScripts = [];
+  var scripts = [];
+%><%include ./partial/page-top.ejs %><%
+include ./partial/header.ejs %>
 <div id="message" ><%- msg %></div>
-</body>
-</html>
+<% include ./partial/page-bottom.ejs %>
