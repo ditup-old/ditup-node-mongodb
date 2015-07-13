@@ -14,6 +14,7 @@ var io = require('socket.io').listen(server);
 
 // database connection
 var mongoose = require('mongoose');
+//require('./app/models/user');
 var db = mongoose.connect('mongodb://localhost/ditup', function (err) {
   if(err) {
     console.log('connection error', err);
@@ -91,9 +92,8 @@ var ioTalkMiddleware = require('./app/controllers/talk-io.js');
 var ioUsers = {};
 ioTalk
   .on('connection', function (socket) {
-    ioTalkMiddleware(socket, {users: ioUsers});
+    ioTalkMiddleware(socket, {users: ioUsers}, ioTalk);
   });
-
 
 server.listen(app.get('port'), function() {
   console.log('Express server listening on port', app.get('port'));
@@ -112,4 +112,4 @@ server.listen(app.get('port'), function() {
   .listen(3000);
 
   console.log('listening on port 3000');
-  */
+*/    

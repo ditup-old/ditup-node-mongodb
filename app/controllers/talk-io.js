@@ -2,7 +2,7 @@
 
 var func = require('./talk-io/functions.js');
 
-module.exports = function  (socket, params) {
+module.exports = function  (socket, params, io) {
   //console.log(socket.request, socket.request.session, socket.request.session.data);
   var sess = socket.request.session.data;
   var users = params.users;
@@ -21,17 +21,28 @@ module.exports = function  (socket, params) {
   
   //find talks in which user is involved and send them to user.
   func.getTalks(username, {})
-    .then(func.processTalks)
+    .then(function (tks) {
+      return func.processTalks(tks, {logged: logged, username: username})
+    })
     .then(function (talks) {
       console.log('emitting', talks);
+      for(var i=0, len=talks.length; i<len; i++){
+        socket.join(talks[i].url);
+      }
       socket.emit('list talks', {talks: talks});
     });
 
   
   //when user wrote a new message, send it to everybody, who cares and has rights to care.
   socket.on('new message', function (data) {
+    console.log(data);
     //validate data
     //save message to database
+    console.log(sess);
+    func.saveMessage(data, {username: username})
+      .then(function (saved) {
+        io.to(data.talk).emit('show message', {msg: saved, talk: data.talk});
+      });
     //send message to the correct talk room.
   });
 
@@ -64,7 +75,10 @@ module.exports = function  (socket, params) {
   socket.on('start talk', function (talk) {
     func.getTalk(talk)
       .then(function (tk) {
-        socket.emit('start talk', tk);
+        return func.processTalk(tk, {logged: logged, username: username});
+      })
+      .then(function (tk) {
+        socket.emit('start talk', {talk: tk});
       })
       .catch(function (err) {
         console.log(err);

@@ -16,6 +16,10 @@
   var newTalkUsers = [];
   var newTalkDits = [];
 
+  var activeTalk = {
+    url: null
+  };
+
 
 //****************incoming socket
   var socket = io(':3000/talk-io');
@@ -41,7 +45,17 @@
   //open a talk
   socket.on('start talk', function (data) {
     console.log('start a talk', data);
+    window.history.pushState({html: 'talk/' + data.talk.url, pageTitle: 'talk ' + data.talk.url}, '', '/talk/'+data.talk.url);
+    activeTalk.url = data.talk.url;
+    displayTalk(data);
   });
+
+  socket.on('show message', function (data) {
+    console.log(data);
+    if(activeTalk.url === data.talk){
+      displayMessage(data.msg);
+    }
+  })
 
   socket.on('disconnect', function () {
     $chat.append('disconnected from the server<br />');
@@ -51,7 +65,7 @@
     e.preventDefault();
     var msg = $message.val();
     $message.val('');
-    socket.emit('new message', {msg: msg});
+    socket.emit('new message', {msg: msg, talk: activeTalk.url});
   });
   
   //this piece shows or hides form which starts a new talk to users
@@ -133,12 +147,44 @@
 
   function addTalk(talk){
     var talkElement = $(document.createElement('div'))
-      .text('talk ' + String(talk.id))
+      .text('talk ' + JSON.stringify(talk))
       .on('mouseup', function () {
-        console.log('start talk', talk.id);
-        socket.emit('start talk', {id: talk.id});
+        console.log('start talk', talk.url);
+        socket.emit('start talk', {url: talk.url});
       });
     $talkList.append(talkElement);
+  }
+
+  function displayTalk(data) {
+  //this should show the talk ready for chatting
+    var talk = data.talk;
+    $chat.empty();
+    var $users = $(document.createElement('div')).text('users');
+    console.log($chat);
+    console.log('appending',$chat.append($users));
+
+    console.log($users);
+    var users = talk.participants.users;
+    //console.log(users);
+    for(var i=0, len=users.length; i<len; i++) {
+      var $user = $(document.createElement('span'));
+      var $online = $(document.createElement('span')).text('o').appendTo($user); //online?
+      $(document.createElement('span')).text(users[i].username).appendTo($user);
+      $user.appendTo($users);
+      console.log($user);
+    }
+    var msgs = talk.messages;
+    for(var i=0, len=msgs.length; i<len; i++) {
+      var msg = msgs[i];
+      displayMessage(msg);
+    }
+  }
+
+  function displayMessage(msg) {
+      var $msg = $(document.createElement('div')).appendTo($chat).css({'background-color': 'blue', 'margin': '5px'});
+      $(document.createElement('span')).css({}).text(msg.sent).appendTo($msg);
+      $(document.createElement('span')).css({'font-weight': 'bold'}).text(msg.from.username).appendTo($msg);
+      $(document.createElement('span')).text(msg.text).appendTo($msg);
   }
 
 
