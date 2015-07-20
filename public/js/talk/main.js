@@ -1,7 +1,14 @@
 'use strict';
 
-//require(['/libs/js/jquery', '/socket.io/socket.io'], 
-(function ($, io) {
+require.config({
+  baseUrl: '/js/talk/',
+  paths: {
+    jquery: '/libs/js/jquery',
+    socketio: '/socket.io/socket.io'
+  }
+});
+
+require(['TalkList', 'Talk', 'jquery', 'socketio'], function (TL, TK, $, io) {
   //DOM elements
   var $chat = $('#chat');
   var $sendMessage = $('#send-message');
@@ -12,18 +19,26 @@
   var $newTalkButton = $('#new-talk-button');
   var $talkList = $('#talk-list');
 
+
   //variables
   var newTalkUsers = [];
   var newTalkDits = [];
 
-  var activeTalk = {
-    url: null
-  };
+  var activeTalk;
+
+  var me = {logged: false, username: 'guest'};
 
 
 //****************incoming socket
   var socket = io(':3000/talk-io');
   //var socket = io();
+
+  var TalkList = new TL({
+    dom: {
+      list: $talkList
+    },
+    socket: socket
+  });
 
   socket.on('connect', function () {
     $chat.append('connected to the server<br />');
@@ -31,31 +46,54 @@
 
   socket.on('auth', function (sess) {
     $chat.append('you are '+(sess.logged !== true ? 'not ': '')+'logged in'+(sess.logged === true ? (' as '+ sess.username) : '')+'.<br />');
+    me = {logged: sess.logged, username: sess.username || me.username}
   });
   
   //show available talks
   socket.on('list talks', function (data) {
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     var talks = data.talks;
-    for(var i=0, len=talks.length; i<len; i++) {
-      addTalk(talks[i]);
+    for(var len=talks.length-1; len>=0; len--) {
+      TalkList.addTalk(talks[len]);
     }
   });
 
   //open a talk
   socket.on('start talk', function (data) {
-    console.log('start a talk', data);
-    window.history.pushState({html: 'talk/' + data.talk.url, pageTitle: 'talk ' + data.talk.url}, '', '/talk/'+data.talk.url);
-    activeTalk.url = data.talk.url;
-    displayTalk(data);
+    //console.log('start a talk', data);
+    window.history.pushState({html: 'talk/' + encodeURIComponent(data.talk.url), pageTitle: 'talk ' + data.talk.url}, '', '/talk/' + encodeURIComponent(data.talk.url));
+    activeTalk = new TK({
+      dom: {
+        chat: $chat
+      },
+      talk: data.talk
+    });
+    TalkList.addTalk({
+      url: data.talk.url,
+      viewed: data.talk.viewed,
+      lastMessage: data.talk.messages[data.talk.messages.length-1]
+    });
+    TalkList.sort();
   });
 
   socket.on('show message', function (data) {
     console.log(data);
     if(activeTalk.url === data.talk){
-      displayMessage(data.msg);
+      activeTalk.addMessage(data.msg);
     }
-  })
+    var talkFragment = {
+      url: data.talk,
+      viewed: data.msg.from.username === me.username ? true : false,
+      lastMessage: data.msg
+    };
+    TalkList.addTalk(talkFragment);
+
+  });
+
+  //socket.on('add talk to list', function (talk) {
+  //  console.log('add talk to list', talk);
+    //TalkList.addTalk(talk);
+  //});
 
   socket.on('disconnect', function () {
     $chat.append('disconnected from the server<br />');
@@ -145,48 +183,5 @@
     $(this).remove(); 
   });
 
-  function addTalk(talk){
-    var talkElement = $(document.createElement('div'))
-      .text('talk ' + JSON.stringify(talk))
-      .on('mouseup', function () {
-        console.log('start talk', talk.url);
-        socket.emit('start talk', {url: talk.url});
-      });
-    $talkList.append(talkElement);
-  }
 
-  function displayTalk(data) {
-  //this should show the talk ready for chatting
-    var talk = data.talk;
-    $chat.empty();
-    var $users = $(document.createElement('div')).text('users');
-    console.log($chat);
-    console.log('appending',$chat.append($users));
-
-    console.log($users);
-    var users = talk.participants.users;
-    //console.log(users);
-    for(var i=0, len=users.length; i<len; i++) {
-      var $user = $(document.createElement('span'));
-      var $online = $(document.createElement('span')).text('o').appendTo($user); //online?
-      $(document.createElement('span')).text(users[i].username).appendTo($user);
-      $user.appendTo($users);
-      console.log($user);
-    }
-    var msgs = talk.messages;
-    for(var i=0, len=msgs.length; i<len; i++) {
-      var msg = msgs[i];
-      displayMessage(msg);
-    }
-  }
-
-  function displayMessage(msg) {
-      var $msg = $(document.createElement('div')).appendTo($chat).css({'background-color': 'blue', 'margin': '5px'});
-      $(document.createElement('span')).css({}).text(msg.sent).appendTo($msg);
-      $(document.createElement('span')).css({'font-weight': 'bold'}).text(msg.from.username).appendTo($msg);
-      $(document.createElement('span')).text(msg.text).appendTo($msg);
-  }
-
-
-
-})(jQuery, io);
+});

@@ -16,6 +16,8 @@ var getTalks = function (username, params) {
       var userId=users[0]._id;
       console.log('user_id', userId);
       return TalkModel.find({'participants.users.id': userId})
+        .sort('-messages.sent')
+        .limit(5)
         .populate({path: 'participants.users.id', model: 'User', select: 'username -_id'})
         .populate({path: 'messages.from', model: 'User', select: 'username -_id'})
         //.populate('participants.dits', 'url')
@@ -45,7 +47,8 @@ module.exports =
   saveNewTalk: saveNewTalk,
   getTalk: getTalk,
   processTalk: processTalk,
-  saveMessage: saveMessage
+  saveMessage: saveMessage,
+  setTalkViewed: setTalkViewed
 };
 
 function saveMessage(data, sender){
@@ -120,9 +123,13 @@ function saveNewTalk(data) {
       });
       newTalk.save(function(err, nu){
         if(err) deferred_.reject(err);
-        deferred_.resolve(nu);
+        deferred_.resolve({id: nu._id});
       });
       return deferred_.promise;
+    })
+    .then(getTalk)
+    .then(function (talk) {
+      deferred.resolve(talk);
     })
     .catch(function(e){
       console.log(e);
@@ -133,7 +140,7 @@ function saveNewTalk(data) {
 
 function getTalk (talk) {
   var deferred = Q.defer();
-  talk.id = base64ToHex(talk.url);
+  talk.id = talk.id || base64ToHex(talk.url);
   TalkModel
     .findOne({_id: mongoose.Types.ObjectId(talk.id)})
     .populate({path: 'participants.users.id', model: 'User', select: 'username -_id'})
@@ -163,11 +170,9 @@ function processTalk(talk, session) {
       if (tpu[j].id.username === session.username) {
         if(tpu[j].viewed === true) viewed = true;
       }
-      else {
-        usrs.push({
-          username: tpu[j].id.username
-        });
-      }
+      usrs.push({
+        username: tpu[j].id.username
+      });
     }
 
     var tpd = talk.participants.dits;
@@ -214,6 +219,7 @@ function processTalks(talks, session) {
       var usrs = [];
       var dits = [];
       var viewed = false;
+      var lastMessage = tk.messages[tk.messages.length-1];
       
       for (var j = 0, len2 = tk.participants.users.length; j < len2; j++) {
         //console.log(JSON.stringify(tk.participants.users[j]));
@@ -228,7 +234,7 @@ function processTalks(talks, session) {
 
       for (var j = 0, len2 = tk.participants.dits.length; j < len2; j++) {
         dits.push({
-          url: tk.participants.dits[j].url
+          url: tk.participants.dits[j].url,
         });
       }
 
@@ -238,12 +244,25 @@ function processTalks(talks, session) {
         participants: {
           users: usrs,
           dits: dits
-        }
+        },
+        lastMessage: lastMessage
       });
     }
     deferred.resolve(processed);
   });
 
+  return deferred.promise;
+}
+
+function setTalkViewed(value, talkUrl, userId) {
+  var talkId = base64ToHex(talkUrl);
+  var deferred = Q.defer();
+//value = bool (set viewed to true or false?)
+  TalkModel.update({_id: talkId, 'participants.users.id': userId}, {'$set':{'participants.users.$.viewed':value}}, function (err, retVal){
+    console.log(err, retVal);
+    if (err) deferred.reject(err);
+    deferred.resolve(retVal);
+  });
   return deferred.promise;
 }
 

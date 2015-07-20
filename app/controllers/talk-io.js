@@ -8,12 +8,14 @@ module.exports = function  (socket, params, io) {
   var users = params.users;
   var logged = (sess && sess.logged === true) ? true : false;
   var username = logged ? sess.username : null;
+  var myId = logged ? sess.id : null;
   
   if (logged === true) {
-    users[username] = {
-      username: username,
-      socket: socket
+    users[username] = users[username] || {
+      username: username
     };
+    users[username].sockets = users[username].sockets || [];
+    users[username].sockets.push(socket);
   }
 
   socket.emit('auth', {logged: logged, username: username});
@@ -54,13 +56,40 @@ module.exports = function  (socket, params, io) {
     //validate data {users[], dits[], message}
     func.validateNewTalk(data)
       .then(function () {
+        console.log(1);
         return func.saveNewTalk(data);
       })
-      .then(function () {
-        return showTalk(data);
+      .then(function (newTalk) {
+        console.log(2, newTalk);
+        return func.processTalk(newTalk, {logged: logged, username: username});
+      })
+      .then(function (newTalkProcessed) {
+        console.log(3, newTalkProcessed);
+        //join the talk room by me (all my active sockets)
+        var sckts = users[username].sockets;
+        for (var i = 0, len = sckts.length; i<len; i++) {
+          console.log('joining', i);
+          sckts[i].join(newTalkProcessed.url);
+        }
+        //join the talk room by all the other users (all their active sockets)
+        var talkUsers = newTalkProcessed.participants.users;
+        for (var i=0, len=talkUsers.length; i<len; i++) {
+          var usrnm = talkUsers[i].username;
+          console.log(users, usrnm);
+          if(users.hasOwnProperty(usrnm)) {
+            var sckts = users[usrnm].sockets;
+            for (var j=0, len2=sckts.length; j<len2; j++) {
+              console.log('others joining', j);
+              sckts[j].join(newTalkProcessed.url);
+            }
+          }
+        }
+        console.log('ready to show');
+        //io.to(newTalkProcessed.url).emit('add talk to list', newTalkProcessed);
+        return showTalk({talk: newTalkProcessed});
       })
       .catch(function (e) {
-        console.log(JSON.stringify(e));
+        console.log('error', e);
       });
     //save talk to database
     //put talk to users array
@@ -69,16 +98,22 @@ module.exports = function  (socket, params, io) {
 
   function showTalk(data) {
     //data should be list of participants and messages (last several messages)
-    socket.emit('show talk', data);
+    socket.emit('start talk', data);
+    console.log('showTalk', data);
   }
 
   socket.on('start talk', function (talk) {
-    func.getTalk(talk)
+    console.log(talk);
+    func.setTalkViewed(true, talk.url, myId)
+      .then(function (tak) {
+        console.log('set', tak);
+        return func.getTalk(talk);
+      })
       .then(function (tk) {
         return func.processTalk(tk, {logged: logged, username: username});
       })
       .then(function (tk) {
-        socket.emit('start talk', {talk: tk});
+        showTalk({talk: tk});
       })
       .catch(function (err) {
         console.log(err);

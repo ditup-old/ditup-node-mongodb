@@ -45,6 +45,7 @@ router.post('/', function (req, res, next) {
             if (data.logged === true) {
                 sess.logged = true;
                 sess.username = req.body.username;
+                sess.id = data.id;
                 res.render('sysinfo', {
                   msg: 'login successful',
                   session: sess
@@ -85,7 +86,7 @@ function authenticate (username, password) {
     })
     .then(function (sameHashes) {
         if (sameHashes === true && username === user.username) {
-            deferred.resolve({logged: true, username: username});
+            deferred.resolve({logged: true, username: username, id: user._id});
         }
         else deferred.resolve({logged: false});
     });
