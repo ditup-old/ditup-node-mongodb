@@ -59,7 +59,9 @@ define(['jquery'], function($){
 
     this.participants = {
       users: {},
-      dits: {}
+      dits: {},
+      colorBase: Math.random(),
+      colorNumber: 0
     };
 
     var talk = data.talk;
@@ -79,11 +81,17 @@ define(['jquery'], function($){
     return this;
   };
 
+  Talk.prototype.makeColor = function () {
+    var phi = 0.618033988749895;
+    var h = (this.participants.colorBase + phi*this.participants.colorNumber)%1;
+    this.participants.colorNumber++;
+    return hsvToRgb(h, 0.2, 0.95);
+  };
+
   Talk.prototype.addUser = function (usr) {
-    var color = generateRandomColor();
     var user = new User({
       user: usr,
-      color: color
+      color: this.makeColor()
     });
     this.participants.users[usr.username]=user;
     user.addTo(this.dom.participants.users);
@@ -94,29 +102,59 @@ define(['jquery'], function($){
     message.addTo(this.dom.chat);
   };
 
-function generateRandomColor(mix) {
-  var mix = mix || [255, 255, 255];
-  var r = getRandomInt(0, 255);
-  var g = getRandomInt(0, 255);
-  var b = getRandomInt(0, 255);
+  function generateRandomColor(mix) {
+    var mix = mix || [255, 255, 255];
+    var r = getRandomInt(0, 255);
+    var g = getRandomInt(0, 255);
+    var b = getRandomInt(0, 255);
 
-// mix the color
-  r = Math.floor((r + mix[0]) / 2);
-  g = Math.floor((g + mix[1]) / 2);
-  b = Math.floor((b + mix[2]) / 2);
-  r = r.toString(16);
-  g = g.toString(16);
-  b = b.toString(16);
-  r = r.length==1 ? '0'+r : r;
-  g = g.length==1 ? '0'+g : g;
-  b = b.length==1 ? '0'+b : b;
-  console.log('color',r,g,b);
-  return '#'+r+g+b;
-}
+  // mix the color
+    r = Math.floor((r + mix[0]) / 2);
+    g = Math.floor((g + mix[1]) / 2);
+    b = Math.floor((b + mix[2]) / 2);
+    r = r.toString(16);
+    g = g.toString(16);
+    b = b.toString(16);
+    r = r.length==1 ? '0'+r : r;
+    g = g.length==1 ? '0'+g : g;
+    b = b.length==1 ? '0'+b : b;
+    console.log('color',r,g,b);
+    return '#'+r+g+b;
+  }
 
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function hsvToRgb(h, s, v) {
+    var c = v*s;
+    var h_i = h*6;
+    var x = c*(1-Math.abs((h_i%2)-1));
+    var m = v - c;
+
+    var rgbi;
+    if (h_i >=0 && h_i < 1)     rgbi = [c, x, 0];
+    else if (h_i >=1 && h_i <2) rgbi = [x, c, 0];
+    else if (h_i >=2 && h_i <3) rgbi = [0, c, x];
+    else if (h_i >=3 && h_i <4) rgbi = [0, x, c];
+    else if (h_i >=4 && h_i <5) rgbi = [x, 0, c];
+    else if (h_i >=5 && h_i <6) rgbi = [c, 0, x];
+
+    var rgb = [
+      Math.floor((rgbi[0]+m)*256),
+      Math.floor((rgbi[1]+m)*256),
+      Math.floor((rgbi[2]+m)*256)
+    ];
+
+    var r = rgb[0].toString(16);
+    var g = rgb[1].toString(16);
+    var b = rgb[2].toString(16);
+    r = r.length==1 ? '0'+r : r;
+    g = g.length==1 ? '0'+g : g;
+    b = b.length==1 ? '0'+b : b;
+    console.log('color',r,g,b);
+    return '#'+r+g+b;
+  }
 
   return Talk;
 });
