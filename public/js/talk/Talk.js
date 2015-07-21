@@ -82,6 +82,7 @@ define(['jquery'], function($){
   };
 
   Talk.prototype.makeColor = function () {
+    //******* http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
     var phi = 0.618033988749895;
     var h = (this.participants.colorBase + phi*this.participants.colorNumber)%1;
     this.participants.colorNumber++;
@@ -127,6 +128,8 @@ define(['jquery'], function($){
   }
 
   function hsvToRgb(h, s, v) {
+    //******* http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
+    //******* https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
     var c = v*s;
     var h_i = h*6;
     var x = c*(1-Math.abs((h_i%2)-1));
