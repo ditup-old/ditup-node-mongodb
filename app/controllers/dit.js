@@ -7,7 +7,7 @@ var Q = require('q');
 
 router
   .get('/', function (req, res, next) {
-    var url = req.originalUrl;
+    var url = '/'+req.originalUrl.replace(/^[\/]+|[\/]+$/,'');
     return res.redirect(url+'s');
   })
   .get('/:url', function (req, res, next) {
@@ -41,7 +41,7 @@ router
         return fcs.processDitData(dit);
       })
       .then(function (data) {
-        res.render('dit-profile', {data:data, rights:rights});
+        res.render('dit-profile', {data:data, rights:rights, session: sess});
       })
       .fail(function (err) {
         if(err.message === 'abort promise chain') {
@@ -50,7 +50,7 @@ router
         else throw err;
       })
       .catch(function (err) {
-        res.render('sysinfo', {msg: err});
+        res.render('sysinfo', {msg: err, session: sess});
       });
   })
   .get('/:url/logo', function (req, res, next) {
@@ -89,7 +89,7 @@ router
         return fcs.processDitDataEdit(dit);
       })
       .then(function (data) {
-        res.render('dit-profile-edit', {data:data, rights:rights});
+        res.render('dit-profile-edit', {data:data, rights:rights, session: sess});
       })
       .fail(function (err) {
         if(err.message === 'abort promise chain') {
@@ -98,7 +98,7 @@ router
         else throw err;
       })
       .catch(function (err) {
-        res.render('sysinfo', {msg: err});
+        res.render('sysinfo', {msg: err, session: sess});
       });
   })
   .post('/:url/edit', function (req, res, next) {
@@ -134,10 +134,10 @@ router
         //req.session; //TODO put message to show in the next page 
         return res.redirect('/'+data.form+'/'+url);
       }, function (errors) {
-        return res.render('dit-profile-edit', {data:formData, rights:rights, errors: errors});
+        return res.render('dit-profile-edit', {data:formData, rights:rights, errors: errors, session: sess});
       })
       .catch(function (err) {
-        return res.render('sysinfo', {msg: err});
+        return res.render('sysinfo', {msg: err, session: sess});
       });
   });
 

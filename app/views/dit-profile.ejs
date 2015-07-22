@@ -1,5 +1,15 @@
-<html>
-<head>
+<%
+var css = [
+  '/css/header.css',
+  '/css/dit-profile.css'
+];
+var title = '*' + data.name ;
+
+var headScripts = [];
+var scripts = [];
+
+%><% include ./partial/page-top.ejs %>
+<% include ./partial/header.ejs %>
 
 <style>
   div.logo {
@@ -10,8 +20,6 @@
     width:64px;
   }
 </style>
-</head>
-<body>
 <div><!-- basic dit info -->
   <div class="logo" ></div>
   <div>
@@ -29,5 +37,4 @@
   <div><%= data.summary %></div>
   <div><h1>about the <%= data.form %></h1><div><%= data.about %></div></div>
 </div>
-</body>
-</html>
+<% include ./partial/page-bottom.ejs %>

@@ -34,7 +34,7 @@ router
         return res.render('user-profile', {profile: profile, rights: rights, session: sess});
       })
       .catch(function (err) {
-        res.render('sysinfo', {msg: err});
+        res.render('sysinfo', {msg: err, session: sess});
       });
   })
   .get('/:username/avatar', function (req, res, next) {
@@ -90,10 +90,10 @@ router
         return fcs.processUserDataEdit(user);
       })
       .then(function (profile) {
-        return res.render('user-profile-edit', {profile: profile});
+        return res.render('user-profile-edit', {profile: profile, session: sess});
       })
       .catch(function (err) {
-        return res.render('sysinfo', {msg: err});
+        return res.render('sysinfo', {msg: err, session: sess});
       });
   })
   .post('/:username/edit', function (req, res, next){
@@ -129,7 +129,7 @@ router
         return res.redirect('/user/' + username);
       })
       .catch(function (err) {
-        return res.render('sysinfo', {msg: err});
+        return res.render('sysinfo', {msg: err, session: sess});
       });
   });
 
