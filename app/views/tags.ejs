@@ -1,0 +1,20 @@
+<%
+var css = [
+  '/css/header.css',
+  '/css/tags.css'
+];
+var title = 'ditup tags';
+
+var headScripts = [];
+var scripts = [];
+
+%><% include ./partial/page-top.ejs %>
+<% include ./partial/header.ejs %>
+
+<style>
+</style>
+<h1>Tags page</h1>
+<div><a href="/tags/create">create new tag</a></div>
+<div>most popular tags</div>
+<div>brainstorm: recently added tags, random tags...</div>
+<% include ./partial/page-bottom.ejs %>

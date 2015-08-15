@@ -14,6 +14,8 @@
   {"url":"/projects", "controller":"dits", "type": "use"},
   {"url":"/challenge", "controller":"dit", "type": "use"},
   {"url":"/challenges", "controller":"dits", "type": "use"},
+  {"url":"/tag", "controller":"tag", "type": "use"},
+  {"url":"/tags", "controller":"tags", "type": "use"},
   {"url":"/talk", "controller":"talk", "type": "use"},
   {"url":"/base", "controller":"bases", "type": "use"},
   {"url":"/bases", "controller":"bases", "type": "use"},

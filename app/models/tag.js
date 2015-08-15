@@ -7,7 +7,7 @@ var TagSchema = new Schema({
   name: {type: String, unique: true},
   description: {type: String},
   meta: {
-    create_time: {type: Date},
+    create_time: {type: Date, default: Date.now},
     creator: {type: Schema.ObjectId, ref: 'user'},
     users: [{type: Schema.ObjectId, ref: 'user'}],
     dits: [{type: Schema.ObjectId, ref: 'dit'}]
