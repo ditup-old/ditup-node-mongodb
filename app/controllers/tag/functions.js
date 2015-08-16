@@ -71,7 +71,32 @@ function createTag (data) {
   return deferred.promise;
 }
 
+function searchTags(queryString) {
+  var deferred = Q.defer();
+
+  if(queryString.length === 0) {
+    deferred.resolve([]);
+  }
+  else {
+    var queryStringFixed = queryString.replace(/[^a-zA-Z0-9]+/gi, '-');
+
+    TagModel
+      .find({name: {'$regex': queryStringFixed, '$options': 'i' }}, '-_id name description')
+      .exec()
+      .then(function (foundTags) {
+        //console.log('tags', foundTags);
+        return deferred.resolve(foundTags);
+      })
+      .then(undefined, function (err) {
+        return deferred.reject(err);
+      });
+  }
+
+  return deferred.promise;
+}
+
 module.exports = {
   getTag: getTag,
-  createTag: createTag
+  createTag: createTag,
+  searchTags: searchTags
 };

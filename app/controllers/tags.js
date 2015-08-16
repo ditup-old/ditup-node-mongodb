@@ -45,4 +45,20 @@ router.post('/create', function (req, res, next) {
     });
 });
 
+router.get('/search/:query', function (req, res, next) {
+  var query = req.params.query;
+  console.log('query', query);
+  var sess = req.session;
+
+  func.searchTags(query)
+    .then(function (tags) {
+      res.setHeader('Content-Type', 'application/json');
+      return res.send(JSON.stringify(tags));
+      //res.end(JSON.stringify(tags));
+    })
+    .catch(function (err) {
+      return res.render('sysinfo', {msg: err, session: sess});
+    });
+});
+
 module.exports=router;
