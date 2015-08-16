@@ -2,6 +2,7 @@
 
 var Q = require('q');
 var TagModel = require('../../models/tag');
+var UserModel = require('../../models/user');
 var fs = require('fs');
 
 var getTag = function (tag) {
@@ -31,54 +32,37 @@ function createTag (data) {
   //  dits: [{type: Schema.ObjectId, ref: 'dit'}]
   //}
   var deferred = Q.defer();
-  //data={array of usernames, array of dit urls}
 
-  Q(UserModel.find({username: data.creator}, '_id').exec())
+  console.log('creating');
+
+  //Q(UserModel.find({username: data.creator}, '_id').exec())
+  Q.resolve([{_id: data.creator.id}])
     .then(function (_myId) {
-      console.log('hello', _myId[0]._id.constructor);
-//        myId = mongoose.Types.ObjectId(_myId[0]._id);
-      myId = _myId[0]._id;
-      console.log('myId',myId);
-      return UserModel.find({
-        'username': { $in: data.usernames}
-      }, '_id').exec();
-    })
-    .then(function (_userIds){
+      console.log('creator found', _myId);
       var deferred_ = Q.defer();
-      console.log('ids',_userIds);
-      for(var i=0, len=_userIds.length; i<len; i++){
-        userIds.push(String(_userIds[i]._id));
-        //userIds.push(mongoose.Types.ObjectId(_userIds[i]._id));
-      }
-      console.log('indexofmyid', userIds.indexOf(String(myId)));
-      if(userIds.indexOf(String(myId)) === -1) userIds.push(String(myId));
-      var usersWhole = [];
-      for(var i=0, len=userIds.length; i<len; i++){
-        usersWhole.push({
-          id: mongoose.Types.ObjectId(userIds[i]),
-          viewed: String(userIds[i]) === String(myId) ? true : false
-        });
-      }
-      console.log(userIds);
-      var newTalk = new TalkModel({
-        participants: {
-          users: usersWhole,
+      var myId = _myId[0]._id;
+      var newTag = new TagModel({
+        name: data.name,
+        description: data.description,
+        meta: {
+          creator: myId,
+          users: [],
           dits: []
-        },
-        messages: [{
-          from: myId,
-          text: data.message
-        }]
+        }
       });
-      newTalk.save(function(err, nu){
-        if(err) deferred_.reject(err);
-        deferred_.resolve({id: nu._id});
+      newTag.save(function(err, nu){
+        console.log('saving in progress');
+        if(err) {
+          if (11000 === err.code || 11001 === err.code) return deferred_.reject('tag '+data.name+' already exists. use existing tag or name your new tag differently.');
+          return deferred_.reject(err);
+        }
+          //console.log(nu, err);
+        return deferred_.resolve({id: nu._id});
       });
       return deferred_.promise;
     })
-    .then(getTalk)
-    .then(function (talk) {
-      deferred.resolve(talk);
+    .then(function (_id) {
+      deferred.resolve(_id);
     })
     .catch(function(e){
       console.log(e);
