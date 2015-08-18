@@ -54,11 +54,12 @@ var myRightsToUser = function (me, user) {
 };
 
 var processUserData = function (userData) {
+  console.log(userData);
   var deferred = Q.defer();
   process.nextTick(function(){
     var profile = {};
     //age
-    profile.age = userData.profile.birthday != '' ? '' + countAge(userData.profile.birthday) + ' years old' : null ;
+    profile.age = userData.profile.birthday instanceof Date ? '' + countAge(userData.profile.birthday) + ' years old' : '' ;
     //gender
     profile.gender = (userData.profile.gender != '' && userData.profile.gender != 'unspecified') ? userData.profile.gender : '';
     //joined
@@ -85,7 +86,8 @@ var processUserDataEdit = function (userData) {
     var profile = {};
     //age
     var brthDate = userData.profile.birthday;
-    var birth = (brthDate.constructor === Date) ? {
+    console.log(typeof(brthDate), typeof(null), brthDate instanceof Date);
+    var birth = (brthDate instanceof Date) ? {
       month: brthDate.getUTCMonth()+1,
       day: brthDate.getUTCDate(),
       year: brthDate.getUTCFullYear()
@@ -242,34 +244,27 @@ function countAge(dateString) {
 
 function countLastLogin(dateString) {
   if (!dateString) return 'Never logged in.'
-  var diff = Math.floor((Date.now() - (new Date(dateString)).getTime())/1000);
-  if (diff === 0) {
-    return 'Logged right now.';
+  var sec = Math.floor((Date.now() - (new Date(dateString)).getTime())/1000);
+  if (sec === 0) return 'Logged right now.';
+
+  if(sec<60) return 'Logged '+ sec + ' second' + (sec>1 ? 's' : '') + ' ago.';
+  var min = Math.floor(sec/60);
+  if(min<60) return 'Logged ' + min + ' minute' + (min>1 ? 's' : '') + ' ago';
+  var hour = Math.floor(min/60);
+  if(hour<24) return 'Logged ' + hour + ' hour' + (hour>1 ? 's' : '') + ' ago';
+  var day = Math.floor(hour/24);
+  if(day<7) return 'Logged ' + day + ' day' + (day>1 ? 's' : '') + ' ago';
+  else if(day<30) {
+    var week = Math.floor(day/7);
+    return 'Logged ' + week + ' week' + (week>1 ? 's' : '') + ' ago';
   }
-  else if(diff<60){ //seconds
-    return 'Logged '+ diff + 'seconds ago.';
-  }
-  else if(Math.floor(diff/60)<60){ //minutes
-    diff = Math.floor(diff/60);
-    return 'Logged ' + diff + 'minutes ago';
-  }
-  else if(Math.floor(diff/60)<24){
-    diff = Math.floor(diff/60);
-    return 'Logged ' + diff + 'hours ago';
-  }
-  else if(Math.floor(diff/24)<7){ //hours
-    diff = Math.floor(diff/24);
-    return 'Logged ' + Math.floor(diff/24) + 'days ago';
-  }
-  else if(diff<30){
-    return 'Logged ' + Math.floor(diff/7) + 'weeks ago';
-  }
-  else if(diff<365){
-    return 'Logged ' + Math.floor(diff/30) + 'months ago';
+  else if(day<365) {
+    var month = Math.floor(day/30);
+    return 'Logged ' + month + ' month' + (month>1 ? 's' : '') + ' ago';
   }
   else {
-    return 'Logged ' + Math.floor(diff/365) + 'years ago';
+    var year = Math.floor(day/365);
+    return 'Logged ' + year + ' year' + (year>1 ? 's' : '') + ' ago';
   }
-
 }
 

@@ -61,4 +61,21 @@ router.get('/search/:query', function (req, res, next) {
     });
 });
 
+router.post('/search', function (req, res, next) {
+  var query = req.body.query;
+  console.log('query', query);
+  var sess = req.session;
+
+  func.searchTags(query)
+    .then(function (tags) {
+      res.setHeader('Content-Type', 'application/json');
+      return res.send(JSON.stringify(tags));
+      //res.end(JSON.stringify(tags));
+    })
+    .catch(function (err) {
+      res.setHeader('Content-Type', 'application/json');
+      return res.send(JSON.stringify(err));
+    });
+});
+
 module.exports=router;

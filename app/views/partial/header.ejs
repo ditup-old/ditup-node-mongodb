@@ -17,7 +17,7 @@
     </li><!--
  --><li><a href="/people">people</a>
       <ul>
-        <li><a href="/user/USERNAME">my profile</a></li>
+        <li><a href="/user/<%= session.username %>">my profile</a></li>
         <li>groups</li>
       </ul>
     </li><!--
@@ -35,7 +35,7 @@
 	<div id="search-form-header-results" ></div>
     </li><!--
     --><% if(session.logged === true) { %><!--
-    --><li><a href="/user/USERNAME"><span id="header-user-avatar" class="span-image" style="background-image:url('/user/<%= session.username %>/avatar')"></span>@<%= session.username %><i class="fa fa-caret-down"></i></a>
+    --><li><a href="/user/<%= session.username %>"><span id="header-user-avatar" class="span-image" style="background-image:url('/user/<%= session.username %>/avatar')"></span>@<%= session.username %><i class="fa fa-caret-down"></i></a>
       <ul>
         <li><a href="/user/<%= session.username %>"><i class="fa fa-user"></i> My profile</a></li>
         <li><a href="/user/<%= session.username %>/edit"><i class="fa fa-pencil"></i> Edit profile</a></li>
