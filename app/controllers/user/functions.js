@@ -2,6 +2,7 @@
 
 var Q = require('q');
 var UserModel = require('../../models/user');
+var TagModel = require('../../models/tag');
 var fs = require('fs');
 
 var months = [
@@ -226,7 +227,8 @@ module.exports = {
   validateProfile: validateProfile,
   updateUserProfile: updateUserProfile,
   getAvatar: getAvatar,
-  getErrorImage: getErrorImage
+  getErrorImage: getErrorImage,
+  addTagToUser: addTagToUser
 };
 
 
@@ -268,3 +270,29 @@ function countLastLogin(dateString) {
   }
 }
 
+function addTagToUser(data) {
+  //data: username, tagname
+  var deferred = Q.defer();
+  console.log('adding tag', data);
+  TagModel.findOne({name: data.tagname}, '_id').exec()
+    .then(function (tag) {
+      console.log('tag found', tag);
+      return UserModel.findOneAndUpdate({username: data.username}, {
+            $addToSet: {
+              'profile.tags': tag._id,
+            }
+          }, {safe: true, upsert: true, new : true}
+        )
+        .exec();
+ 
+    }, function (err) {console.log(err)})
+    .then(function (object) {
+      console.log(JSON.stringify(object));
+      deferred.resolve(object);
+    })
+    .then(function (undefined, err) {
+      console.log(JSON.stringify(err));
+      deferred.reject(err);
+    });
+  return deferred.promise;
+}

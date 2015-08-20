@@ -1,5 +1,6 @@
 [
   {"url":"/", "controller":"home", "type": "get"},
+  {"url":"/ajax", "controller":"ajax", "type": "use"},
   {"url":"/login", "controller":"login", "type": "use"},
   {"url":"/signup", "controller":"signup", "type": "use"},
   {"url":"/logout", "controller":"logout", "type": "use"},

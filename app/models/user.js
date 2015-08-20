@@ -10,7 +10,8 @@ var UserSchema = new mongoose.Schema({
     surname: String,  //Human surname
     birthday: Date,   //birthday (used to show age only)
     gender: String,   //male, female, other
-    about: String     //user's personal description
+    about: String,     //user's personal description
+    tags: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tag'}]
   },
   account:{
     join_date: Date,

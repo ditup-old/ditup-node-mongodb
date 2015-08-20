@@ -2,19 +2,21 @@
 
 require.config({
   urlArgs: "bust=" + (new Date()).getTime(),
-  baseUrl: '/js/tags/',
+  baseUrl: '/js',
   paths: {
     jquery: '/libs/js/jquery'
   }
 });
 
-require(['TagSearch', 'TagSearchItem', 'jquery'], function (TagSearch, TagSearchItem, $) {
+require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function (TagSearch, TagSearchItem, Tag, $) {
   //DOM elements
-  var $tagSearch = $('#tag-search');
+  //var $tagSearch = $('#tag-search');
   var $tagSearchInput = $('#tag-search-input');
   var $tagSearchOutput = $('#tag-search-output');
   var $tagList = $('#tag-list');
   //variables
+
+  var tagTemplate = '<span></span>'
 
   var tagBox = new TagSearch({
     input: $tagSearchInput,
@@ -39,12 +41,22 @@ require(['TagSearch', 'TagSearchItem', 'jquery'], function (TagSearch, TagSearch
           });
 
           //save tag to list of user tags
+          $.ajax({
+            url: '/ajax/add-tag',
+            async: true,
+            method: 'POST',
+            data: {tagname: tagData.name},
+            dataType: 'json'
+          })
+          .then(function (resp){
+            console.log(JSON.stringify(resp));
+          });
           //change unsaved tag to saved tag on success
           var tagListItem = $(document.createElement('li')).append(tag.dom.main);
           tagListItem.appendTo($tagList);
         },
-        asdf: function () {}
       });
+      console.log(item);
       return item.dom.main;
     }
   });
