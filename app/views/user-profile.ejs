@@ -5,7 +5,14 @@ var css = [
 ];
 var title = 'profile of :'+profile.username ;
 
-var headScripts = [];
+var headScripts = [
+  {
+    src: '/libs/js/require.js',
+    properties: {
+      'data-main': '/js/user-profile/main'
+    }
+  }
+];
 var scripts = [];
 
 %><% include ./partial/page-top.ejs %>
@@ -17,6 +24,9 @@ var scripts = [];
     background-size: contain;
     width:100%;
     padding-bottom:100%;
+  }
+  #tag-list>li {
+    display:inline;
   }
 </style>
 <div class="panel-basic" ><!-- basic profile info -->
@@ -32,7 +42,10 @@ var scripts = [];
     <span class="profile-username" >@<%= profile.username %></span>
     <% if (rights.edit === true) { %><span><a class="button" href="/user/<%= profile.username %>/edit">Edit Profile</a></span><% } %></div>
   <div><!-- tags -->
-    <span class="tag" >alternative-education</span><span class="tag" >nomads</span>
+    <ul id="tag-list">
+      <li><span class="tag" >alternative-education</span></li>
+      <li><span class="tag" >nomads</span></li>
+    </ul>
   </div>
   <div><h1>about me</h1><div><%= profile.about %></div></div>
 </div>

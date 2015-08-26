@@ -16,27 +16,75 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
   var $tagList = $('#tag-list');
   //variables
 
-  var tagTemplate = '<span></span>'
+  var tagFunctions = {
+    click: function (tagData) {
+      //link to the tag page
+      return function () {};
+    },
+    close: function (tagData) {
+      return function () {
+        console.log(tagData.name);
+        //remove tag of user from database
+        $.ajax({
+          url: '/ajax/remove-tag',
+          async: true,
+          method: 'POST',
+          data: {tagname: tagData.name},
+          dataType: 'json'
+        })
+        .then(function (resp){
+          console.log(JSON.stringify(resp));
+          if(resp.hasOwnProperty('success') && resp.success === true) {
+            tag.del(true);
+          }
+          else if(resp.hasOwnProperty('success') && resp.success === false) {
+            tag.del();
+          }
+        });
+        //on success remove this tag from th
+      };
+    }
+  };
+
+  //show tags
+  $.ajax({
+    url: '/ajax/get-tags',
+    async: true,
+    method: 'POST',
+    data: {username: 'test1'}, //just for testing purposes! how to get username?
+    dataType: 'json'
+  })
+  .then(function (resp){
+    $tagList.empty();
+    console.log(JSON.stringify(resp));
+    for(var i=0, len=resp.length; i<len; i++){
+      var tag = new Tag({
+        data: resp[i],
+        click: tagFunctions.click(resp[i]),
+        close: tagFunctions.close(resp[i]),
+        saved: true
+      });
+
+      var tagListItem = $(document.createElement('li')).append(tag.dom.main);
+      tagListItem.appendTo($tagList);
+    }
+  });
+
+  var tagTemplate = '<span></span>';
 
   var tagBox = new TagSearch({
     input: $tagSearchInput,
     output: $tagSearchOutput,
     process: function (tagData) {
       var item = new TagSearchItem({
-        tag2: 'asdf',
         tag: tagData,
         action: function (data) {
           //show unsaved tag in the list
           console.log('clicked tag');
           var tag = new Tag({
             data: tagData,
-            click: function () {
-              //link to the tag page
-            },
-            close: function () {
-              //remove tag of user from database
-              //on success remove this tag from th
-            },
+            click: tagFunctions.click(tagData),
+            close: tagFunctions.close(tagData),
             saved: false
           });
 
@@ -50,6 +98,12 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
           })
           .then(function (resp){
             console.log(JSON.stringify(resp));
+            if(resp.hasOwnProperty('success') && resp.success === true) {
+              tag.saved(true);
+            }
+            else if(resp.hasOwnProperty('success') && resp.success === false) {
+              tag.del();
+            }
           });
           //change unsaved tag to saved tag on success
           var tagListItem = $(document.createElement('li')).append(tag.dom.main);

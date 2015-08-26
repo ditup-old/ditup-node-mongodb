@@ -228,7 +228,9 @@ module.exports = {
   updateUserProfile: updateUserProfile,
   getAvatar: getAvatar,
   getErrorImage: getErrorImage,
-  addTagToUser: addTagToUser
+  addTagToUser: addTagToUser,
+  removeTagFromUser: removeTagFromUser,
+  getTagsOfUser: getTagsOfUser
 };
 
 
@@ -277,22 +279,86 @@ function addTagToUser(data) {
   TagModel.findOne({name: data.tagname}, '_id').exec()
     .then(function (tag) {
       console.log('tag found', tag);
-      return UserModel.findOneAndUpdate({username: data.username}, {
+      return UserModel.update({username: data.username}, {
             $addToSet: {
               'profile.tags': tag._id,
             }
-          }, {safe: true, upsert: true, new : true}
+          }, {safe: true, upsert: false, new : true}
         )
         .exec();
  
     }, function (err) {console.log(err)})
-    .then(function (object) {
-      console.log(JSON.stringify(object));
-      deferred.resolve(object);
+    .then(function (result) {
+      console.log(JSON.stringify(result));
+      if (result.ok === 1 && result.nModified === 1 && result.n === 1){
+        deferred.resolve({success: true, tagname: data.tagname});
+      }
+      else if(result.ok === 1 && result.nModified === 0 && result.n === 1){
+        deferred.resolve({success: false, error: 'tag already added'});
+      }
+      else {
+      }
     })
-    .then(function (undefined, err) {
-      console.log(JSON.stringify(err));
+    .then(undefined, function(err) {
+      console.log('err', JSON.stringify(err));
       deferred.reject(err);
     });
+  return deferred.promise;
+}
+
+function removeTagFromUser(data) {
+  //data: username, tagname
+  var deferred = Q.defer();
+  console.log('removing tag', data);
+  /*TagModel.findOne({name: data.tagname}, '_id').exec()
+    .then(function (tag) {
+      console.log('tag found', tag);
+      return UserModel.update({username: data.username}, {
+            $addToSet: {
+              'profile.tags': tag._id,
+            }
+          }, {safe: true, upsert: false, new : true}
+        )
+        .exec();
+ 
+    }, function (err) {console.log(err)})
+    .then(function (result) {
+      console.log(JSON.stringify(result));
+      if (result.ok === 1 && result.nModified === 1 && result.n === 1){
+        deferred.resolve({success: true, tagname: data.tagname});
+      }
+      else if(result.ok === 1 && result.nModified === 0 && result.n === 1){
+        deferred.resolve({success: false, error: 'tag already added'});
+      }
+      else {
+      }
+    })
+    .then(undefined, function(err) {
+      console.log('err', JSON.stringify(err));
+      deferred.reject(err);
+    });
+    */
+  deferred.reject({error: 'deleting tag not implemented on server side'});
+  return deferred.promise;
+}
+
+function getTagsOfUser(data) {
+  /**
+   * will return promise of tags of user
+   * data: {username: ...}
+   * 
+   */
+  var deferred = Q.defer();
+
+  UserModel.findOne({username: data.username}, 'profile.tags -_id')
+    .populate({path: 'profile.tags', model: 'Tag', select: 'name -_id'})
+    //and sort tags by tagname?
+    .exec()
+    .then(function (output) {
+      return deferred.resolve(output.profile.tags || []);
+    }, function (err) {
+      return deferred.reject(err);
+    });
+
   return deferred.promise;
 }
