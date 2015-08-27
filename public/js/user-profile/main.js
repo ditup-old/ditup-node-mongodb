@@ -13,6 +13,10 @@ require(['tags/Tag', 'jquery'], function (Tag, $) {
   var $tagList = $('#tag-list');
   //variables
 
+  var urlPath = window.location.pathname.replace(/^\/*|\/*$/g, '').split('/');
+  console.log(urlPath);
+  var username = urlPath[1];
+
   var tagFunctions = {
     click: function (tagData) {
       //link to the tag page
@@ -28,12 +32,15 @@ require(['tags/Tag', 'jquery'], function (Tag, $) {
     url: '/ajax/get-tags',
     async: true,
     method: 'POST',
-    data: {username: 'test1'}, //just for testing purposes! how to get username?
+    data: {username: username}, //just for testing purposes! how to get username?
     dataType: 'json'
   })
   .then(function (resp){
     $tagList.empty();
     console.log(JSON.stringify(resp));
+    if(resp.length === 0) {
+      $($.parseHTML('<li><span class="tag unsaved">user '+username+' has no tags</span></li>')).appendTo($tagList);
+    }
     for(var i=0, len=resp.length; i<len; i++){
       var tag = new Tag({
         data: resp[i],

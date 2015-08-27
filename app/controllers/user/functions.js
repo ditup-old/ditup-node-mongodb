@@ -310,14 +310,14 @@ function removeTagFromUser(data) {
   //data: username, tagname
   var deferred = Q.defer();
   console.log('removing tag', data);
-  /*TagModel.findOne({name: data.tagname}, '_id').exec()
+  TagModel.findOne({name: data.tagname}, '_id').exec()
     .then(function (tag) {
       console.log('tag found', tag);
       return UserModel.update({username: data.username}, {
-            $addToSet: {
+            $pull: {
               'profile.tags': tag._id,
             }
-          }, {safe: true, upsert: false, new : true}
+          }, {safe: true}
         )
         .exec();
  
@@ -328,7 +328,7 @@ function removeTagFromUser(data) {
         deferred.resolve({success: true, tagname: data.tagname});
       }
       else if(result.ok === 1 && result.nModified === 0 && result.n === 1){
-        deferred.resolve({success: false, error: 'tag already added'});
+        deferred.resolve({success: false, error: 'tag was not found'});
       }
       else {
       }
@@ -337,8 +337,7 @@ function removeTagFromUser(data) {
       console.log('err', JSON.stringify(err));
       deferred.reject(err);
     });
-    */
-  deferred.reject({error: 'deleting tag not implemented on server side'});
+  //deferred.reject({error: 'deleting tag not implemented on server side'});
   return deferred.promise;
 }
 

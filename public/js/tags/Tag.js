@@ -30,14 +30,16 @@ define(['jquery'], function ($) {
       this.dom.close.remove();
     }
     else {
+      var self = this;
       this.dom.close.on('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        data.close();
+        console.log(self);
+        data.close.call(self);
       });
     }
     this.dom.main.on('click', function () {
-      data.click();
+      data.click.call(self);
     });
     this.saved(data.saved);
   };

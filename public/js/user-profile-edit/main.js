@@ -16,6 +16,10 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
   var $tagList = $('#tag-list');
   //variables
 
+  var urlPath = window.location.pathname.replace(/^\/*|\/*$/g, '').split('/');
+  console.log(urlPath);
+  var username = urlPath[1];
+
   var tagFunctions = {
     click: function (tagData) {
       //link to the tag page
@@ -23,6 +27,7 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
     },
     close: function (tagData) {
       return function () {
+        var self = this;
         console.log(tagData.name);
         //remove tag of user from database
         $.ajax({
@@ -35,10 +40,10 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
         .then(function (resp){
           console.log(JSON.stringify(resp));
           if(resp.hasOwnProperty('success') && resp.success === true) {
-            tag.del(true);
+            console.log(self);
+            self.del();
           }
           else if(resp.hasOwnProperty('success') && resp.success === false) {
-            tag.del();
           }
         });
         //on success remove this tag from th
@@ -51,7 +56,7 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
     url: '/ajax/get-tags',
     async: true,
     method: 'POST',
-    data: {username: 'test1'}, //just for testing purposes! how to get username?
+    data: {username: username}, //just for testing purposes! how to get username?
     dataType: 'json'
   })
   .then(function (resp){
@@ -83,8 +88,8 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
           console.log('clicked tag');
           var tag = new Tag({
             data: tagData,
-            click: tagFunctions.click(tagData),
-            close: tagFunctions.close(tagData),
+            click: tagFunctions.click.call(tag, tagData),
+            close: tagFunctions.close.call(tag, tagData),
             saved: false
           });
 

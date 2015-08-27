@@ -43,7 +43,6 @@ router.post('/remove-tag', function (req, res, next) {
     });
 });
 
-
 router.get('/get-tags/user/:username', function (req, res, next) {
   var username = req.params.username;
   console.log('username', username);
