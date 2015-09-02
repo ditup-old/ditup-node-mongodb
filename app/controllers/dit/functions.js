@@ -23,7 +23,8 @@ var processDitData = function (dit) {
     created: new Date(),
     name: 'Static Test',
     summary: 'this dit is not connected to database',
-    about: 'this is some description'
+    about: 'this is some description',
+    activity: 'activity should be an array of latest actions to feed...'
   });
 };
 

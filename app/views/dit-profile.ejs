@@ -1,7 +1,8 @@
 <%
 var css = [
   '/css/header.css',
-  '/css/dit-profile.css'
+  '/css/dit-profile.css',
+  '/css/tag-elem.css'
 ];
 var title = '*' + data.name ;
 
@@ -13,28 +14,41 @@ var scripts = [];
 
 <style>
   div.logo {
-    background-image: url('/<% data.form %>/<%= data.url %>/logo');
+    background-image: url('/<%= data.form %>/<%= data.url %>/logo');
     background-repeat: no-repeat;
     background-size: contain;
     height:64px;
     width:64px;
   }
 </style>
-<div><!-- basic dit info -->
+<div class="panel-basic" ><!-- basic dit info -->
   <div class="logo" ></div>
-  <div>
-    <div><%= data.form %></div>
-    <div><%= data.created %></div>
-    <div>tags</div>
-  </div>
+  <div><%= data.form %></div>
+  <div><%= data.created %></div>
 </div>
-<div><!--  -->
+<div class="panel-info"><!--  -->
   <div>
-    <span><%= data.name %></span>
-    <span><%= data.form %>:<%= data.url %></span>
-    <% if (rights.edit === true) { %><span><a href="/<%= data.form %>/<%= data.url %>/edit">Edit <%= data.form %></a></span><% } %>
+    <span class="profile-name" ><%= data.name %></span>
+    <span class="profile-form" ></span><span class="data-url"><%= data.url %></span>
+    <% if (rights.edit === true) { %><span><a class="button" href="/<%= data.form %>/<%= data.url %>/edit">Edit <%= data.form %></a></span><% } %>
   </div>
   <div><%= data.summary %></div>
-  <div><h1>about the <%= data.form %></h1><div><%= data.about %></div></div>
+  <div><!-- tags -->
+    <ul id="tag-list">
+      <li><span class="tag" ></span></li>
+      <li><span class="tag" ></span></li>
+      <li><span class="tag" ></span></li>
+    </ul>
+  </div>
+  <div class="top-menu">
+  <a href="about">about</a>
+  <a href="people">people</a>
+  <a href="brainstorm">brainstorm</a>
+  <a href="gtd">GTD</a>
+  <% if (rights.edit === true) { %><a href="edit">edit</a><% } %>
+  <a href="">...</a>
+  </div>
+  <div class="about" ><h1>about</h1><div><%= data.about %></div></div>
+  <div class="activity" ><h1>activity</h1><div><%= data.activity %></div></div>
 </div>
 <% include ./partial/page-bottom.ejs %>

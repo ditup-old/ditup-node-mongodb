@@ -60,6 +60,7 @@ router
     next();
   })
   .get('/:url/edit', function (req, res, next) {
+    var sess = req.session.data;
     var url = req.params.url;
     var originalUrl = req.originalUrl;
     var urlArray = req.originalUrl.replace(/^[\/]+|[\/]+$/,'').split('/');
@@ -72,11 +73,13 @@ router
     var dit, data, rights;
     Q.when(fcs.getDit({url:url}))
       .then(function (_dit) {
+        console.log('editing step 0');
         dit = _dit;
         var me = {logged: sess.logged, username: sess.username};
         return fcs.getMyRightsToDit(me, dit);
       })
       .then(function (_rights) {
+        console.log('editing step 1');
         rights = _rights;
         if (rights.edit !== true){
           Q.reject('you don\'t have rights to edit the dit');
@@ -92,6 +95,7 @@ router
         res.render('dit-profile-edit', {data:data, rights:rights, session: sess});
       })
       .fail(function (err) {
+        console.log('fail', err);
         if(err.message === 'abort promise chain') {
         
         }
@@ -102,6 +106,7 @@ router
       });
   })
   .post('/:url/edit', function (req, res, next) {
+    var sess = req.session.data;
     var url = req.params.url;
     var form = req.body;
     var formData = {
