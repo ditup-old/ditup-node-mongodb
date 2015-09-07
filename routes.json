@@ -11,6 +11,8 @@
   {"url":"/dits", "controller":"dits", "type": "use"},
   {"url":"/idea", "controller":"dit", "type": "use"},
   {"url":"/ideas", "controller":"dits", "type": "use"},
+  {"url":"/interest", "controller":"dit", "type": "use"},
+  {"url":"/interests", "controller":"dits", "type": "use"},
   {"url":"/project", "controller":"dit", "type": "use"},
   {"url":"/projects", "controller":"dits", "type": "use"},
   {"url":"/challenge", "controller":"dit", "type": "use"},

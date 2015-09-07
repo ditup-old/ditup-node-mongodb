@@ -15,7 +15,7 @@ router
     var url = req.params.url;
     var originalUrl = req.originalUrl;
     var urlArray = req.originalUrl.replace(/^[\/]+|[\/]+$/,'').split('/');
-    var originalForm = urlArray[0];
+    var originalDittype = urlArray[0];
   
     //get data(url)
     //get my rights(me, dit)
@@ -34,8 +34,8 @@ router
           Q.reject('you don\'t have rights to see the dit');
           throw new Error('abort promise chain');
         }
-        if (dit.form !== originalForm) {
-          res.redirect('/'+dit.form+'/'+url);
+        if (dit.dittype !== originalDittype) {
+          res.redirect('/'+dit.dittype+'/'+url);
           throw new Error('abort promise chain');
         }
         return fcs.processDitData(dit);
@@ -64,7 +64,7 @@ router
     var url = req.params.url;
     var originalUrl = req.originalUrl;
     var urlArray = req.originalUrl.replace(/^[\/]+|[\/]+$/,'').split('/');
-    var originalForm = urlArray[0];
+    var originalDittype = urlArray[0];
   
     //get data(url)
     //get my rights(me, dit)
@@ -85,8 +85,8 @@ router
           Q.reject('you don\'t have rights to edit the dit');
           throw new Error('abort promise chain');
         }
-        if (dit.form !== originalForm) {
-          res.redirect('/'+dit.form+'/'+url+'/edit');
+        if (dit.dittype !== originalDittype) {
+          res.redirect('/'+dit.dittype+'/'+url+'/edit');
           throw new Error('abort promise chain');
         }
         return fcs.processDitDataEdit(dit);
@@ -110,7 +110,7 @@ router
     var url = req.params.url;
     var form = req.body;
     var formData = {
-      form: form.form,
+      dittype: form.dittype,
       name: form.name,
       summary: form.summary,
       about: form.about
@@ -123,25 +123,31 @@ router
     var dit, data, rights;
     Q.when(fcs.getDit({url:url}))
       .then(function (_dit) {
+        console.log('step 00');
         dit = _dit;
         var me = {logged: sess.logged, username: sess.username};
         return fcs.iCanEditDit(me, dit);
       })
       .then(function (_rights) {
+        console.log('step 01');
         rights = _rights;
         return fcs.validateDitForm(formData);
       })
       .then(function (validData) {
+        console.log('step 02');
         data = validData;
+        console.log(data, url);
         return fcs.updateDitProfile(url, validData);
       })
-      .then(function () {
+      .then(function (ret) {
+        console.log('step 03', ret);
         //req.session; //TODO put message to show in the next page 
-        return res.redirect('/'+data.form+'/'+url);
+        return res.redirect('/'+data.dittype+'/'+url);
       }, function (errors) {
         return res.render('dit-profile-edit', {data:formData, rights:rights, errors: errors, session: sess});
       })
-      .catch(function (err) {
+      .then(null, function (err) {
+        console.log(err);
         return res.render('sysinfo', {msg: err, session: sess});
       });
   });

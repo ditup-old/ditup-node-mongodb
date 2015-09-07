@@ -3,7 +3,6 @@
 var Q = require('q');
 var TagModel = require('../../models/tag');
 var UserModel = require('../../models/user');
-var fs = require('fs');
 
 var getTag = function (tag) {
   var deferred = Q.defer();
@@ -24,13 +23,14 @@ var getTag = function (tag) {
 
 function createTag (data) {
   //name: {type: String, unique: true},
-  //description: {type: String},
+  //summary: {type: String},
   //meta: {
   //  create_time: {type: Date},
   //  creator: {type: Schema.ObjectId, ref: 'user'},
   //  users: [{type: Schema.ObjectId, ref: 'user'}],
   //  dits: [{type: Schema.ObjectId, ref: 'dit'}]
   //}
+
   var deferred = Q.defer();
 
   console.log('creating');

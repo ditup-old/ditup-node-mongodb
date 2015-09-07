@@ -59,3 +59,9 @@ a {
 a:hover {
     text-decoration:none;
 }
+
+input[type=submit] {
+  /*padding: 0;*/
+  border: none;
+  line-height: 1;
+}

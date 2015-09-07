@@ -41,7 +41,7 @@ router.post('/create', function (req, res, next) {
       res.redirect('/tag/'+data.name);      
     })
     .catch(function (err) {
-      res.render('sysinfo', {msg: err, session: sess});
+      res.render('sysinfo', {msg: err, session: sess.data});
     });
 });
 

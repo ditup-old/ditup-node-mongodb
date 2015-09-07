@@ -6,7 +6,14 @@ var css = [
 ];
 var title = '*' + data.name ;
 
-var headScripts = [];
+var headScripts = [
+  {
+    src: '/libs/js/require.js',
+    properties: {
+      'data-main': '/js/dit-profile-edit/main'
+    }
+  }
+];
 var scripts = [];
 
 %><% include ./partial/page-top.ejs %>
@@ -14,7 +21,7 @@ var scripts = [];
 
 <style>
   div.logo {
-    background-image: url('/<%= data.form %>/<%= data.url %>/logo');
+    background-image: url('/<%= data.dittype %>/<%= data.url %>/logo');
     background-repeat: no-repeat;
     background-size: contain;
     height:64px;
@@ -25,12 +32,12 @@ var scripts = [];
 <div class="panel-basic" ><!-- basic dit info -->
   <div class="logo" >change dit logo</div>
   <div>type
-    <select name="form">
+    <select name="dittype">
       <option value="unspecified">unspecified</option>
-      <option <% if (data.form === 'idea') { %> selected="selected"<% } %> value="idea">idea</option>
-      <option <% if (data.form === 'project') { %> selected="selected"<% } %> value="project">project</option>
-      <option <% if (data.form === 'challenge') { %> selected="selected"<% } %> value="challenge">challenge</option>
-      <option <% if (data.form === 'interest') { %> selected="selected"<% } %> value="interest">interest</option>
+      <option <% if (data.dittype === 'idea') { %> selected="selected"<% } %> value="idea">idea</option>
+      <option <% if (data.dittype === 'project') { %> selected="selected"<% } %> value="project">project</option>
+      <option <% if (data.dittype === 'challenge') { %> selected="selected"<% } %> value="challenge">challenge</option>
+      <option <% if (data.dittype === 'interest') { %> selected="selected"<% } %> value="interest">interest</option>
     </select>
   </div>
   <div><%= data.created %></div>
@@ -53,14 +60,10 @@ var scripts = [];
       <li><span class="tag" ></span></li>
       <li><span class="tag" ></span></li>
     </ul>
+    <input id="tag-search-input" type="text" placeholder="add tag" />
+    <ul id="tag-search-output" style="position:absolute; background-color:white" ></ul>
   </div>
   <div class="top-menu">
-  <a href="about">about</a>
-  <a href="people">people</a>
-  <a href="brainstorm">brainstorm</a>
-  <a href="gtd">GTD</a>
-  <% if (rights.edit === true) { %><a href="edit">edit</a><% } %>
-  <a href="">...</a>
   </div>
   <div class="about" ><h1>about</h1>
     <div>
@@ -69,3 +72,4 @@ var scripts = [];
   </div>
 </div>
 </form>
+<% include ./partial/page-bottom.ejs %>

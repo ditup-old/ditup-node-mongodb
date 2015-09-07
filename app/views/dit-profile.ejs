@@ -14,7 +14,7 @@ var scripts = [];
 
 <style>
   div.logo {
-    background-image: url('/<%= data.form %>/<%= data.url %>/logo');
+    background-image: url('/<%= data.dittype %>/<%= data.url %>/logo');
     background-repeat: no-repeat;
     background-size: contain;
     height:64px;
@@ -23,14 +23,14 @@ var scripts = [];
 </style>
 <div class="panel-basic" ><!-- basic dit info -->
   <div class="logo" ></div>
-  <div><%= data.form %></div>
+  <div><%= data.dittype %></div>
   <div><%= data.created %></div>
 </div>
 <div class="panel-info"><!--  -->
   <div>
-    <span class="profile-name" ><%= data.name %></span>
-    <span class="profile-form" ></span><span class="data-url"><%= data.url %></span>
-    <% if (rights.edit === true) { %><span><a class="button" href="/<%= data.form %>/<%= data.url %>/edit">Edit <%= data.form %></a></span><% } %>
+    <span class="profile-dittype" ><%= data.dittype %></span>: <span class="profile-name" ><%= data.name %></span>
+    <span class="data-url"><%= data.url %></span>
+    <% if (rights.edit === true) { %><span><a class="button" href="/<%= data.dittype %>/<%= data.url %>/edit">Edit <%= data.dittype %></a></span><% } %>
   </div>
   <div><%= data.summary %></div>
   <div><!-- tags -->

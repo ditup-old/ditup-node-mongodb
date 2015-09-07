@@ -4,20 +4,23 @@ var mongoose = require('mongoose');
 
 var DitSchema = new mongoose.Schema({
   url: {type: String, unique: true},
-  form: {type: String, enum: ['idea', 'project', 'challenge', 'interest']},
+  dittype: {type: String, enum: ['', 'idea', 'project', 'challenge', 'interest'], default: ''},
   profile: {
     name: String,     //Dit name
-    subtitle: String,  //dit surname
-    description: String     //dit description
+    summary: String,  //dit tweet-length summary of dit's purpose
+    about: String     //dit description
   },
+  tags: [{type: mongoose.Schema.ObjectId, ref: 'tag'}],
+  members: [{
+    user: {type: mongoose.Schema.ObjectId, ref: 'user'},
+    relation: {type: String, enum: ['member', 'admin', 'joined', 'invited']}
+  }],
   meta: {
-    created: Date,
+    created: {type: Date, default: Date.now},
     creator: {type: mongoose.Schema.ObjectId, ref: 'user'},
   },
   settings: {
-    privacy: {
-      visible: {type: String, enum:['all', 'logged', 'members', 'none']} //who can see user profile?
-    }
+    view: {type: String, enum: ['all', 'members', 'admins'], default: 'members'}
   }
 }, {collection: 'dit'});
 
