@@ -3,6 +3,104 @@
 var Q = require('q');
 var DitModel = require('../../models/dit');
 var UserModel = require('../../models/user');
+var TagModel = require('../../models/tag');
+
+
+function addTagToDit(tag, dit) {
+  //data: username, tagname
+  var deferred = Q.defer();
+  console.log('adding tag', tag, 'to dit', dit);
+  TagModel.findOne({name: tag.name}, '_id').exec()
+    .then(function (tag) {
+      if(tag===null) return Q.reject({error: 'tag doesn\'t exist'});
+      console.log('tag found', tag);
+      return DitModel.update({
+        url: dit.url
+      }, {
+        $addToSet: {
+          'tags': tag._id,
+        }
+      }, {safe: true, upsert: false, new : true})
+      .exec();
+    }, function (err) {console.log(err); return Q.reject(err);})
+    .then(function (result) {
+      console.log(result, JSON.stringify(result));
+      if (result.ok === 1 && result.nModified === 1 && result.n === 1){
+        return deferred.resolve({success: true, tagname: tag.name});
+      }
+      else if(result.ok === 1 && result.nModified === 0 && result.n === 1){
+        return deferred.resolve({success: false, error: 'tag already added'});
+      }
+      else {
+        return Q.reject({error: 'other error, todo'});
+      }
+    })
+    .then(null, function(err) {
+      console.log('err', err, JSON.stringify(err));
+      deferred.reject(err);
+    });
+  return deferred.promise;
+}
+
+function removeTagFromDit(tag, dit) {
+  //data: username, tagname
+  var deferred = Q.defer();
+  console.log('removing tag', tag, 'from dit', dit);
+  TagModel.findOne({name: tag.name}, '_id').exec()
+    .then(function (tag) {
+      if(tag === null) {
+        return Q.reject({error: 'tag doesn\'t exist'});
+      }
+      console.log('tag found', tag);
+      return DitModel.update({url: dit.url}, {
+        $pull: {
+          'tags': tag._id,
+        }
+      }, {safe: true})
+      .exec();
+    }, function (err) {console.log(err); return Q.reject(err);})
+    .then(function (result) {
+      console.log(JSON.stringify(result));
+      if (result.ok === 1 && result.nModified === 1 && result.n === 1){
+        deferred.resolve({success: true, tagname: tag.name});
+      }
+      else if(result.ok === 1 && result.nModified === 0 && result.n === 1){
+        deferred.resolve({success: false, error: 'tag was not found'});
+      }
+      else {
+        return Q.reject({error: 'removing tag from dit not ok. why?'});
+      }
+    })
+    .then(undefined, function(err) {
+      console.log('err', JSON.stringify(err));
+      deferred.reject(err);
+    });
+  //deferred.reject({error: 'deleting tag not implemented on server side'});
+  return deferred.promise;
+}
+
+function getTagsOfDit(data) {
+  /**
+   * will return promise of tags of user
+   * data: {username: ...}
+   * 
+   */
+  var deferred = Q.defer();
+
+  DitModel.findOne({url: data.url}, 'tags -_id')
+    .populate({path: 'tags', model: 'Tag', select: 'name -_id'})
+    //and sort tags by tagname?
+    .exec()
+    .then(function (output) {
+      console.log('tags found', output);
+      return deferred.resolve(output.tags || []);
+    }, function (err) {
+      return deferred.reject(err);
+    });
+
+  return deferred.promise;
+}
+
 
 var getDit = function (dit) {
   var deferred = Q.defer();
@@ -11,7 +109,8 @@ var getDit = function (dit) {
     .populate({path: 'members.user', model: 'User', select: 'username -_id'})
     .exec()
     .then(function (dit) {
-      console.log(dit);
+      //console.log('dit', dit);
+      if(dit === null) return deferred.reject('404 this dit doesn\'t exist');
       return deferred.resolve(dit);
     })
     .then(null, function (err) {
@@ -34,17 +133,17 @@ var getMyRightsToDit = function (me, dit) {
   var membership;
   var meInDit=null;
   var viewSettings = dit.settings.view;
-  console.log('input to rights', me, dit, viewSettings);
+  //console.log('input to rights', me, dit, viewSettings);
   if(me.logged === true){
-    console.log('in logged');
+    //console.log('in logged');
     for (var i=0, len=dit.members.length; i<len; i++) {
-      console.log(dit.members[i].user.username, me.username);
+    //  console.log(dit.members[i].user.username, me.username);
       if (dit.members[i].user.username === me.username){
         meInDit=dit.members[i].relation;
         break;
       }
     }
-    console.log('me in dit', meInDit);
+   // console.log('me in dit', meInDit);
     //update edit rights
     if(meInDit!==null && meInDit==='admin'){
       edit=true;
@@ -59,7 +158,7 @@ var getMyRightsToDit = function (me, dit) {
       view=true;
     }
   }
-  console.log('my rights to dit', view, edit);
+  //console.log('my rights to dit', view, edit);
   return Q.resolve({
     view: view,
     edit: edit
@@ -186,6 +285,9 @@ module.exports = {
   iCanEditDit: iCanEditDit,
   validateDitForm: validateDitForm,
   updateDitProfile: updateDitProfile,
-  createDit: createDit
+  createDit: createDit,
+  getTagsOfDit: getTagsOfDit,
+  addTagToDit: addTagToDit,
+  removeTagFromDit: removeTagFromDit
 };
 

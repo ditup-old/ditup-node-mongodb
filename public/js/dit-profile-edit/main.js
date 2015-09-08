@@ -18,7 +18,7 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
 
   var urlPath = window.location.pathname.replace(/^\/*|\/*$/g, '').split('/');
   console.log(urlPath);
-  var name = urlPath[1];
+  var url = urlPath[1];
 
   var tagFunctions = {
     click: function (tagData) {
@@ -31,10 +31,10 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
         console.log(tagData.name);
         //remove tag of user from database
         $.ajax({
-          url: '/ajax/remove-tag',
+          url: '/ajax/dit/remove-tag',
           async: true,
           method: 'POST',
-          data: {tagname: tagData.name},
+          data: {tagname: tagData.name, url: url},
           dataType: 'json'
         })
         .then(function (resp){
@@ -56,12 +56,12 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
     url: '/ajax/dit/get-tags',
     async: true,
     method: 'POST',
-    data: {name: name}, //just for testing purposes! how to get username?
+    data: {url: url}, //just for testing purposes! how to get username?
     dataType: 'json'
   })
   .then(function (resp){
     $tagList.empty();
-    console.log(JSON.stringify(resp));
+    console.log('tags found', resp, JSON.stringify(resp));
     for(var i=0, len=resp.length; i<len; i++){
       var tag = new Tag({
         data: resp[i],
@@ -95,18 +95,22 @@ require(['tags/TagSearch', 'tags/TagSearchItem', 'tags/Tag', 'jquery'], function
 
           //save tag to list of user tags
           $.ajax({
-            url: '/ajax/add-tag',
+            url: '/ajax/dit/add-tag',
             async: true,
             method: 'POST',
-            data: {tagname: tagData.name},
+            data: {tagname: tagData.name, url: url},
             dataType: 'json'
           })
           .then(function (resp){
-            console.log(JSON.stringify(resp));
+            console.log(resp, JSON.stringify(resp));
             if(resp.hasOwnProperty('success') && resp.success === true) {
               tag.saved(true);
             }
             else if(resp.hasOwnProperty('success') && resp.success === false) {
+              tag.del();
+            }
+            else{
+              console.log('weird', resp);
               tag.del();
             }
           });

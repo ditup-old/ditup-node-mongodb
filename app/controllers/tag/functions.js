@@ -1,10 +1,16 @@
 'use strict';
 
+module.exports = {
+  getTag: getTag,
+  createTag: createTag,
+  searchTags: searchTags
+};
+
 var Q = require('q');
 var TagModel = require('../../models/tag');
 var UserModel = require('../../models/user');
 
-var getTag = function (tag) {
+function getTag(tag) {
   var deferred = Q.defer();
   if(tag.hasOwnProperty('name')) {
     TagModel.find({name: tag.name}).exec()
@@ -19,7 +25,7 @@ var getTag = function (tag) {
   }
   console.log('getting tag');
   return deferred.promise;
-};
+}
 
 function createTag (data) {
   //name: {type: String, unique: true},
@@ -95,8 +101,3 @@ function searchTags(queryString) {
   return deferred.promise;
 }
 
-module.exports = {
-  getTag: getTag,
-  createTag: createTag,
-  searchTags: searchTags
-};

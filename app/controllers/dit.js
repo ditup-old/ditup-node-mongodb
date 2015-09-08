@@ -31,7 +31,7 @@ router
       .then(function (_rights) {
         rights = _rights;
         if (rights.view !== true){
-          Q.reject('you don\'t have rights to see the dit');
+          return Q.reject('you don\'t have rights to see the dit');
           throw new Error('abort promise chain');
         }
         if (dit.dittype !== originalDittype) {
@@ -43,12 +43,12 @@ router
       .then(function (data) {
         res.render('dit-profile', {data:data, rights:rights, session: sess});
       })
-      .fail(function (err) {
-        if(err.message === 'abort promise chain') {
-        
-        }
-        else throw err;
-      })
+      //.fail(function (err) {
+      //  if(err.message === 'abort promise chain') {
+      //    res.render('sysinfo', {msg: 'you don't have rights'})
+      //  }
+      //  else throw err;
+      //})
       .catch(function (err) {
         res.render('sysinfo', {msg: err, session: sess});
       });
@@ -97,7 +97,7 @@ router
       .fail(function (err) {
         console.log('fail', err);
         if(err.message === 'abort promise chain') {
-        
+          res.render('sysinfo', {msg: 'something failed. you might not have rights to edit this dit', session:sess})
         }
         else throw err;
       })
